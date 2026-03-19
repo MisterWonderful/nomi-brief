@@ -1,17 +1,10 @@
-import nextDynamic from "next/dynamic";
+import { ArticleCard } from "@/components/ArticleCard";
 import { Button } from "@/components/ui/Button";
 import { Sparkles, TrendingUp, Clock, Star } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import type { ComponentType } from "react";
 
 // Force dynamic rendering to avoid SSR issues with framer-motion
 export const dynamic = "force-dynamic";
-
-// Dynamic import to avoid SSR issues with framer-motion
-const ArticleCard = nextDynamic(
-  () => import("@/components/ArticleCard").then((mod) => ({ default: mod.ArticleCard as ComponentType<any> })),
-  { ssr: false }
-);
 
 // Fallback mock data for when database is unavailable
 const fallbackArticles = [

@@ -88,7 +88,7 @@ export async function GET(request: NextRequest) {
 // POST /api/articles - Create a new article
 export async function POST(request: NextRequest) {
   try {
-    // Check API secret auth
+    // Check API secret auth — failsafe: reject if secret is configured but missing/bad
     const apiSecret = process.env.API_SECRET;
     if (apiSecret) {
       const authHeader = request.headers.get("authorization");
@@ -98,6 +98,12 @@ export async function POST(request: NextRequest) {
           { status: 401 }
         );
       }
+    } else {
+      // No API_SECRET configured — block writes to avoid accidental public endpoint
+      return NextResponse.json(
+        { error: "API_SECRET environment variable is not configured. Cannot accept writes." },
+        { status: 503 }
+      );
     }
 
     const body = await request.json();

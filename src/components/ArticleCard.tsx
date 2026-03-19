@@ -1,5 +1,6 @@
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { Clock, Star, Bookmark, ArrowRight, Mic } from "lucide-react";
 
@@ -36,10 +37,11 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
           <article className="glass rounded-3xl overflow-hidden hover:glow-hover transition-all duration-300">
             {/* Cover Image */}
             <div className="relative h-80 overflow-hidden">
-              <img
+              <Image
                 src={article.coverImage || "https://picsum.photos/1200/600"}
                 alt={article.title}
-                className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+                fill
+                className="object-cover transition-transform duration-500 group-hover:scale-105"
               />
               <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent" />
               
@@ -138,10 +140,11 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
         <article className="glass rounded-2xl overflow-hidden hover:glow-hover transition-all duration-300 flex">
           {/* Cover Image */}
           <div className="relative w-64 h-48 flex-shrink-0 overflow-hidden">
-            <img
+            <Image
               src={article.coverImage || "https://picsum.photos/400/300"}
               alt={article.title}
-              className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-105"
             />
             <div className="absolute inset-0 bg-gradient-to-r from-transparent to-zinc-950/80" />
           </div>

@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/Button";
 import { ArrowLeft, Clock, Star, Mic, Calendar, Tag } from "lucide-react";
@@ -47,10 +48,11 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
       {/* Cover Image */}
       {article.coverImage && (
         <div className="relative h-80 rounded-2xl overflow-hidden">
-          <img
+          <Image
             src={article.coverImage}
             alt={article.title}
-            className="w-full h-full object-cover"
+            fill
+            className="object-cover"
           />
           <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/30 to-transparent" />
         </div>

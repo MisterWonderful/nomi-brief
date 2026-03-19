@@ -42,16 +42,16 @@ export default function SettingsPage() {
         <div className="glass rounded-2xl p-6 space-y-4">
           <div className="flex items-center gap-3">
             <Mic2 className="w-5 h-5 text-violet-400" />
-            <h2 className="text-lg font-semibold text-white">OpenClaw Connection</h2>
+            <h2 className="text-lg font-semibold text-white">OpenClaw / Voice</h2>
           </div>
           <div className="space-y-4 pl-8">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-white">Connection Status</p>
-                <p className="text-sm text-zinc-500">Voice integration with OpenClaw</p>
+                <p className="text-white">Voice Feature</p>
+                <p className="text-sm text-zinc-500">OpenClaw voice integration</p>
               </div>
-              <span className="px-3 py-1 text-xs font-medium bg-green-500/20 text-green-400 rounded-full">
-                Ready
+              <span className="px-3 py-1 text-xs font-medium bg-zinc-800 text-zinc-400 rounded-full">
+                Coming soon
               </span>
             </div>
             <div>
@@ -60,9 +60,10 @@ export default function SettingsPage() {
                 https://your-domain.com/api/webhook
               </code>
             </div>
-            <Button variant="secondary" size="sm" disabled>
-              Configure OpenClaw
-            </Button>
+            <p className="text-sm text-zinc-500">
+              Voice sessions and &ldquo;Talk about this&rdquo; are planned for a future release.
+              The webhook endpoint is active and receives articles from OpenClaw.
+            </p>
           </div>
         </div>
 

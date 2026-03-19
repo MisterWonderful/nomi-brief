@@ -1,0 +1,137 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  name      String
+  avatar    String?
+  settings  Settings?
+  articles  Article[]
+  links     LinkEntry[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model Settings {
+  id              String  @id @default(cuid())
+  userId          String  @unique
+  user            User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  theme           String  @default("dark")
+  openclawUrl     String?
+  openclawToken   String?
+  voiceEnabled    Boolean @default(true)
+  notifications   Boolean @default(true)
+  dailyBriefTime  String  @default("08:00")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+}
+
+model Article {
+  id          String   @id @default(cuid())
+  title       String
+  subtitle    String?
+  content     String   @db.Text
+  authorName  String   @default("Nomi Vale")
+  authorAvatar String?
+  coverImage  String?
+  category    String   @default("General")
+  tags        String[]
+  readTime   Int      @default(5)
+  publishedAt DateTime @default(now())
+  
+  // Status
+  isRead      Boolean @default(false)
+  isFavorite  Boolean @default(false)
+  isPublished Boolean @default(true)
+  
+  // Relations
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  links       LinkEntry[]
+  voiceSessions VoiceSession[]
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([publishedAt])
+  @@index([category])
+}
+
+model LinkEntry {
+  id          String   @id @default(cuid())
+  title       String
+  url         String
+  description String?
+  image       String?
+  source      String?  // e.g., "karakeep", "rss", "manual"
+  sourceUrl   String?  // Original source link
+  
+  // Status
+  isRead      Boolean @default(false)
+  isFavorite  Boolean @default(false)
+  
+  // Organization
+  tags        String[]
+  category    String?
+  
+  // Relations
+  userId      String
+  user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  articleId   String?
+  article     Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+  
+  @@index([userId])
+  @@index([articleId])
+  @@index([isRead])
+  @@index([isFavorite])
+}
+
+model VoiceSession {
+  id        String   @id @default(cuid())
+  articleId String?
+  article   Article? @relation(fields: [articleId], references: [id], onDelete: SetNull)
+  
+  // Session data
+  context   String?  @db.Text // Article content or link details passed to OpenClaw
+  summary   String?  @db.Text // Summary of the conversation
+  
+  // Timing
+  startedAt DateTime @default(now())
+  endedAt   DateTime?
+  duration  Int?     // seconds
+  
+  // Status
+  status    String   @default("active") // active, completed, failed
+  
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  
+  @@index([articleId])
+  @@index([status])
+}
+
+model DailyBrief {
+  id          String   @id @default(cuid())
+  date        DateTime @default(now())
+  title       String
+  summary     String?  @db.Text
+  articleCount Int     @default(0)
+  linkCount   Int      @default(0)
+  
+  createdAt   DateTime @default(now())
+  
+  @@index([date])
+}

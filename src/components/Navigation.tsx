@@ -75,14 +75,13 @@ export function Navigation() {
 
       {/* Voice Indicator */}
       <div className="p-4 border-t border-zinc-800/50">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-green-500/10 text-green-400">
+        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-800/50 text-zinc-400">
           <div className="relative">
             <Mic2 className="w-5 h-5" />
-            <span className="absolute -top-1 -right-1 w-2 h-2 bg-green-400 rounded-full animate-pulse" />
           </div>
           <div className="flex-1">
-            <p className="text-sm font-medium">Voice Ready</p>
-            <p className="text-xs text-green-400/70">OpenClaw Connected</p>
+            <p className="text-sm font-medium">Voice</p>
+            <p className="text-xs text-zinc-500">Coming soon</p>
           </div>
         </div>
       </div>

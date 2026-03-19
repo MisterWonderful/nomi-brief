@@ -4,6 +4,9 @@ import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/Button";
 import { ArrowLeft, Clock, Star, Mic, Calendar, Tag } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import ReactMarkdown from "react-markdown";
+import remarkGfm from "remark-gfm";
+import rehypeHighlight from "rehype-highlight";
 
 interface ArticlePageProps {
   params: Promise<{ id: string }>;
@@ -114,9 +117,13 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
       {/* Article Content */}
       <article className="prose prose-invert prose-zinc max-w-none">
-        <div className="text-zinc-300 leading-relaxed whitespace-pre-wrap">
+        <ReactMarkdown
+          remarkPlugins={[remarkGfm]}
+          rehypePlugins={[rehypeHighlight]}
+          className="text-zinc-300 leading-relaxed"
+        >
           {article.content}
-        </div>
+        </ReactMarkdown>
       </article>
 
       {/* Actions */}

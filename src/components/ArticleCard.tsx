@@ -1,11 +1,25 @@
 import { formatDistanceToNow } from "date-fns";
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { Clock, MessageCircle, Star, Bookmark, ArrowRight } from "lucide-react";
-import { Article } from "@/lib/types";
+import { Clock, Star, Bookmark, ArrowRight, Mic } from "lucide-react";
+
+// Relaxed type for ArticleCard - only requires fields it actually renders
+interface ArticleCardData {
+  id: string;
+  title: string;
+  subtitle?: string | null;
+  coverImage?: string | null;
+  category: string;
+  tags: string[];
+  readTime: number;
+  publishedAt: Date | string;
+  isFavorite: boolean;
+  isRead?: boolean;
+  authorName: string;
+}
 
 interface ArticleCardProps {
-  article: Article;
+  article: ArticleCardData;
   featured?: boolean;
 }
 
@@ -90,9 +104,13 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
               {/* Actions */}
               <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
                 <div className="flex items-center gap-2">
-                  <button className="flex items-center gap-2 px-4 py-2 rounded-xl bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 transition-colors">
-                    <MessageCircle className="w-4 h-4" />
-                    <span className="text-sm font-medium">Talk about this</span>
+                  <button 
+                    disabled
+                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800/50 text-zinc-500 cursor-not-allowed"
+                    title="Voice feature coming soon"
+                  >
+                    <Mic className="w-4 h-4" />
+                    <span className="text-sm font-medium">Coming soon</span>
                   </button>
                   <button className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition-colors">
                     <Bookmark className="w-5 h-5" />
@@ -159,11 +177,12 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
                 <span className="text-xs text-zinc-500">{article.readTime} min read</span>
               </div>
               <button 
-                onClick={(e) => e.preventDefault()}
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/10 text-violet-400 hover:bg-violet-500/20 text-xs font-medium transition-colors"
+                disabled
+                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/50 text-zinc-500 text-xs font-medium cursor-not-allowed"
+                title="Voice feature coming soon"
               >
-                <MessageCircle className="w-3.5 h-3.5" />
-                Talk
+                <Mic className="w-3.5 h-3.5" />
+                Soon
               </button>
             </div>
           </div>

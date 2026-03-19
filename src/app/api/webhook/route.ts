@@ -49,20 +49,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Get or create default user
-    let user = await prisma.user.findFirst({
+    // Use upsert pattern for default user to avoid unique constraint violations
+    const user = await prisma.user.upsert({
       where: { email: "nomi@nomibrief.app" },
+      update: {},
+      create: {
+        email: "nomi@nomibrief.app",
+        name: "Ryan",
+        avatar: "https://avatars.githubusercontent.com/u/20233821?v=4",
+      },
     });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          email: "nomi@nomibrief.app",
-          name: "Ryan",
-          avatar: "https://avatars.githubusercontent.com/u/20233821?v=4",
-        },
-      });
-    }
 
     const readTime = calculateReadTime(content);
     const excerpt = extractExcerpt(content);

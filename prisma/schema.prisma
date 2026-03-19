@@ -51,6 +51,10 @@ model Article {
   isFavorite  Boolean @default(false)
   isPublished Boolean @default(true)
   
+  // Source tracking
+  source      String?  @default("ai")
+  sourceUrl   String?
+  
   // Relations
   userId      String
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)

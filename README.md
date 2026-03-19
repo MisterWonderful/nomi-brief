@@ -1,30 +1,51 @@
 # Nomi Brief
 
-> Premium personal news and article delivery platform powered by AI agents
+> Personal news and article delivery platform powered by AI agents
 
-![License](https://img.shields.io/badge/license-MIT-blue.svg)
-![Docker](https://img.shields.io/badge/docker-ready-blue.svg)
-![Next.js](https://img.shields.io/badge/Next.js-14-black.svg)
+## Current State
 
-## Features
+This is a **work in progress** project. The following features are implemented:
 
-- 📰 **Rich Article Delivery** - AI-generated articles with beautiful typography, images, and formatting
-- 🎙️ **Voice Integration** - Speak directly with OpenClaw from any article
-- 🔗 **Link Management** - Save, organize, and access external articles
-- 🌙 **Dark Mode First** - Premium dark theme optimized for reading
-- ⚡ **Real-time Updates** - Live content delivery and notifications
-- 🔒 **Self-Hosted** - Complete control over your data
+### Implemented ✅
+- [x] Next.js 14 with App Router
+- [x] PostgreSQL database with Prisma ORM
+- [x] Dark theme UI with TailwindCSS and Framer Motion
+- [x] Article management (create, list, view)
+- [x] Webhook endpoint for receiving articles from OpenClaw (`POST /api/webhook`)
+- [x] API authentication via `API_SECRET` environment variable
+- [x] Docker and Docker Compose deployment
+- [x] Responsive navigation with articles listing page
 
-## Screenshots
+### Partially Implemented 🔄
+- [ ] Voice integration ("Talk about this") - UI exists but backend not wired
+- [ ] Links management page - route exists but no implementation
+- [ ] Settings page - basic stub UI only
+- [ ] Article detail page with markdown rendering
+- [ ] Bookmark/favorite toggle functionality
+- [ ] User authentication (currently single-user mode)
 
-[Add screenshots here]
+### Planned 📋
+- [ ] Complete voice feature with OpenClaw integration
+- [ ] User settings and preferences
+- [ ] Daily brief generation
+- [ ] Link bookmarking and organization
+- [ ] Full-text search
+- [ ] Email digest notifications
+
+## Tech Stack
+
+- **Frontend**: Next.js 14, React 18, TypeScript
+- **Styling**: TailwindCSS, Framer Motion
+- **Backend**: Next.js API Routes, Prisma ORM
+- **Database**: PostgreSQL 16
+- **Container**: Docker, Docker Compose
 
 ## Quick Start
 
 ### Prerequisites
 
 - Docker & Docker Compose
-- PostgreSQL 16+ (or use the included Docker setup)
+- PostgreSQL 16+ (included in Docker Compose)
 
 ### Installation
 
@@ -40,56 +61,21 @@ cp .env.example .env
 # Edit .env with your settings
 ```
 
-3. **Start with Docker**
+3. **Start with Docker Compose**
 ```bash
 docker compose up -d
 ```
 
-4. **Access the app**
-- Open http://localhost:3000
-- Configure OpenClaw webhook integration in Settings
-
-## Configuration
-
-### Environment Variables
-
-| Variable | Description | Default |
-|----------|-------------|---------|
-| `DATABASE_URL` | PostgreSQL connection string | Required |
-| `OPENCLAW_URL` | OpenClaw instance URL | http://localhost:18789 |
-| `OPENCLAW_TOKEN` | OpenClaw API token | Optional |
-| `JWT_SECRET` | JWT signing secret | Required for production |
-| `VOICE_ENABLED` | Enable voice features | true |
-
-### OpenClaw Integration
-
-To receive AI-generated articles:
-
-1. Go to Settings → Webhooks
-2. Add webhook URL: `https://your-domain.com/api/webhook`
-3. Configure OpenClaw cron to POST articles
-
-Example webhook payload:
-```json
-{
-  "title": "Article Title",
-  "content": "Markdown content...",
-  "subtitle": "Brief description",
-  "category": "AI & Technology",
-  "tags": ["AI", "News"],
-  "coverImage": "https://..."
-}
+4. **Initialize the database**
+```bash
+docker compose exec app npx prisma db push
+docker compose exec app npm run db:seed
 ```
 
+5. **Access the app**
+- Open http://localhost:3000
+
 ## Development
-
-### Tech Stack
-
-- **Frontend**: Next.js 14, React 18, TypeScript
-- **Styling**: TailwindCSS, Framer Motion
-- **Backend**: Next.js API Routes, Prisma ORM
-- **Database**: PostgreSQL 16
-- **Voice**: WebSocket-based real-time communication
 
 ### Local Development
 
@@ -107,76 +93,86 @@ npm run db:push
 npm run dev
 ```
 
-### Database
+### Environment Variables
 
-```bash
-# Open Prisma Studio
-npm run db:studio
-
-# Create migrations
-npm run db:migrate
-
-# Seed database
-npm run db:seed
-```
-
-## Architecture
-
-```
-┌─────────────────────────────────────────────────────────────┐
-│                        Nomi Brief                           │
-├─────────────────────────────────────────────────────────────┤
-│                                                             │
-│  ┌─────────────┐    ┌─────────────┐    ┌─────────────┐    │
-│  │   Next.js   │    │  WebSocket  │    │   OpenClaw  │    │
-│  │  Frontend  │◄──►│   Server    │◄──►│   Agent     │    │
-│  └──────┬──────┘    └─────────────┘    └──────┬──────┘    │
-│         │                                      │           │
-│         │         ┌─────────────┐              │           │
-│         └────────►│ PostgreSQL  │◄─────────────┘           │
-│                   │  Database   │                          │
-│                   └─────────────┘                          │
-│                                                             │
-└─────────────────────────────────────────────────────────────┘
-```
+| Variable | Description | Required |
+|----------|-------------|----------|
+| `DATABASE_URL` | PostgreSQL connection string | Yes |
+| `API_SECRET` | Secret for API authentication | Yes (for POST /api/articles) |
+| `OPENCLAW_URL` | OpenClaw instance URL | No |
+| `OPENCLAW_TOKEN` | OpenClaw API token | No |
+| `JWT_SECRET` | JWT signing secret | No |
 
 ## API Endpoints
 
 ### Articles
-- `GET /api/articles` - List articles
-- `GET /api/articles/[id]` - Get article
-- `POST /api/articles` - Create article
-- `PATCH /api/articles/[id]` - Update article
-- `DELETE /api/articles/[id]` - Delete article
-
-### Links
-- `GET /api/links` - List links
-- `POST /api/links` - Save link
-- `DELETE /api/links/[id]` - Delete link
-
-### Voice
-- `POST /api/voice/session` - Create voice session
-- `GET /api/voice/session/[id]` - Get session status
-- `POST /api/voice/session/[id]/end` - End session
+- `GET /api/articles` - List articles (supports pagination, filtering)
+- `POST /api/articles` - Create article (requires `Authorization: Bearer ${API_SECRET}`)
 
 ### Webhook
-- `POST /api/webhook` - Receive OpenClaw articles
+- `GET /api/webhook` - Verify webhook endpoint
+- `POST /api/webhook` - Receive articles from OpenClaw (accepts `article` type payload)
 
-## Contributing
+Example webhook payload:
+```json
+{
+  "type": "article",
+  "payload": {
+    "title": "Article Title",
+    "content": "Markdown content...",
+    "subtitle": "Brief description",
+    "category": "AI & Technology",
+    "tags": ["AI", "News"],
+    "coverImage": "https://..."
+  }
+}
+```
 
-1. Fork the repository
-2. Create your feature branch (`git checkout -b feature/amazing`)
-3. Commit your changes (`git commit -m 'Add amazing feature'`)
-4. Push to the branch (`git push origin feature/amazing`)
-5. Open a Pull Request
+## Docker
+
+The Dockerfile builds a multi-stage image:
+1. Install dependencies
+2. Build the Next.js app
+3. Create production image
+
+```bash
+# Build image
+docker build -t nomi-brief .
+
+# Run container
+docker run -p 3000:3000 --env-file .env nomi-brief
+```
+
+## Project Structure
+
+```
+nomi-brief/
+├── src/
+│   ├── app/
+│   │   ├── api/
+│   │   │   ├── articles/route.ts
+│   │   │   └── webhook/route.ts
+│   │   ├── articles/
+│   │   │   ├── page.tsx
+│   │   │   └── [id]/page.tsx
+│   │   ├── settings/page.tsx
+│   │   ├── layout.tsx
+│   │   └── page.tsx
+│   ├── components/
+│   │   ├── ArticleCard.tsx
+│   │   ├── Navigation.tsx
+│   │   └── ui/Button.tsx
+│   └── lib/
+│       ├── prisma.ts
+│       ├── utils.ts
+│       └── types.ts
+├── prisma/
+│   └── schema.prisma
+├── docker-compose.yml
+├── Dockerfile
+└── package.json
+```
 
 ## License
 
-MIT License - see [LICENSE](LICENSE) for details.
-
-## Acknowledgments
-
-- Built with [Next.js](https://nextjs.org/)
-- Styled with [TailwindCSS](https://tailwindcss.com/)
-- Icons from [Lucide](https://lucide.dev/)
-- Powered by [OpenClaw](https://openclaw.ai/)
+MIT License

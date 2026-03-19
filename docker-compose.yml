@@ -9,6 +9,7 @@ services:
       - "3000:3000"
     environment:
       - DATABASE_URL=postgresql://nomi:nomibrief2026@postgres:5432/nomibrief?schema=public
+      - API_SECRET=nomi-brief-api-secret-2026
       - OPENCLAW_URL=http://host.docker.internal:18789
       - JWT_SECRET=nomi-brief-secret-key-2026
       - NEXT_PUBLIC_APP_URL=http://localhost:3000
@@ -16,8 +17,6 @@ services:
       - VOICE_ENABLED=true
     depends_on:
       - postgres
-    volumes:
-      - ./uploads:/app/uploads
     restart: unless-stopped
     networks:
       - nomi-brief-network

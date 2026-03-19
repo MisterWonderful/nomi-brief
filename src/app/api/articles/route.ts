@@ -88,6 +88,18 @@ export async function GET(request: NextRequest) {
 // POST /api/articles - Create a new article
 export async function POST(request: NextRequest) {
   try {
+    // Check API secret auth
+    const apiSecret = process.env.API_SECRET;
+    if (apiSecret) {
+      const authHeader = request.headers.get("authorization");
+      if (!authHeader || authHeader !== `Bearer ${apiSecret}`) {
+        return NextResponse.json(
+          { error: "Unauthorized" },
+          { status: 401 }
+        );
+      }
+    }
+
     const body = await request.json();
     const {
       title,
@@ -111,23 +123,16 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use a default userId if not provided
-    const targetUserId = userId || "default";
-
-    // Verify user exists or create default
-    let user = await prisma.user.findUnique({
-      where: { id: targetUserId },
+    // Use upsert pattern for default user to avoid unique constraint violations
+    const user = await prisma.user.upsert({
+      where: { email: "nomi@nomibrief.app" },
+      update: {},
+      create: {
+        email: "nomi@nomibrief.app",
+        name: "Ryan",
+        avatar: "https://avatars.githubusercontent.com/u/20233821?v=4",
+      },
     });
-
-    if (!user) {
-      user = await prisma.user.create({
-        data: {
-          id: targetUserId,
-          email: "nomi@nomibrief.app",
-          name: "Nomi Brief User",
-        },
-      });
-    }
 
     const readTime = calculateReadTime(content);
     const excerpt = extractExcerpt(content);

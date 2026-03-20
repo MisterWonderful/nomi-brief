@@ -7,20 +7,20 @@
 This is a **work in progress** project. The following features are implemented:
 
 ### Implemented ✅
-- [x] Next.js 14 with App Router
+- [x] Next.js 15 with App Router
 - [x] PostgreSQL database with Prisma ORM
 - [x] Dark theme UI with TailwindCSS and Framer Motion
 - [x] Article management (create, list, view)
 - [x] Webhook endpoint for receiving articles from OpenClaw (`POST /api/webhook`)
-- [x] API authentication via `API_SECRET` environment variable
+- [x] API authentication via `API_SECRET` environment variable (required, no fallback)
 - [x] Docker and Docker Compose deployment
 - [x] Responsive navigation with articles listing page
+- [x] Article detail pages with full markdown rendering (GFM + syntax highlighting)
+- [x] Links page (stub, saves articles from webhooks)
 
 ### Partially Implemented 🔄
 - [ ] Voice integration ("Talk about this") - UI exists but backend not wired
-- [ ] Links management page - route exists but no implementation
 - [ ] Settings page - basic stub UI only
-- [ ] Article detail page with markdown rendering
 - [ ] Bookmark/favorite toggle functionality
 - [ ] User authentication (currently single-user mode)
 
@@ -34,7 +34,7 @@ This is a **work in progress** project. The following features are implemented:
 
 ## Tech Stack
 
-- **Frontend**: Next.js 14, React 18, TypeScript
+- **Frontend**: Next.js 15, React 18, TypeScript
 - **Styling**: TailwindCSS, Framer Motion
 - **Backend**: Next.js API Routes, Prisma ORM
 - **Database**: PostgreSQL 16

@@ -60,70 +60,155 @@
 }
 
 @layer components {
-  /* Article typography */
+  /* ── Article typography (prose overrides) ───────────────── */
+  .article-content,
+  article.prose {
+    /* Better line height for readability */
+    line-height: 1.85 !important;
+  }
+
+  .article-content p,
+  article.prose p {
+    @apply mb-6 text-zinc-300;
+    line-height: 1.85;
+    font-size: 1.0625rem;
+  }
+
+  .article-content h2,
+  article.prose h2 {
+    @apply text-2xl font-bold text-white mt-10 mb-4 font-display;
+    font-size: 1.5rem;
+    letter-spacing: -0.02em;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+  }
+
+  .article-content h3,
+  article.prose h3 {
+    @apply text-lg font-semibold text-white/90 mt-8 mb-3;
+    font-size: 1.125rem;
+  }
+
+  /* Links — prominent and obviously clickable */
+  .article-content a,
+  article.prose a {
+    @apply text-violet-400 hover:text-violet-300 transition-colors;
+    text-decoration: underline !important;
+    text-decoration-color: rgba(139, 92, 246, 0.4) !important;
+    text-underline-offset: 3px;
+    font-weight: 500;
+  }
+  .article-content a:hover,
+  article.prose a:hover {
+    text-decoration-color: rgba(167, 139, 250, 0.8) !important;
+  }
+
+  /* Blockquotes — styled as callout boxes */
+  .article-content blockquote,
+  article.prose blockquote {
+    @apply border-l-0 rounded-xl p-5 my-6 text-zinc-300;
+    background: rgba(139, 92, 246, 0.06);
+    border: 1px solid rgba(139, 92, 246, 0.2);
+    font-style: normal;
+    line-height: 1.75;
+  }
+  .article-content blockquote p,
+  article.prose blockquote p {
+    @apply mb-0 text-zinc-300;
+    font-size: 1rem;
+  }
+
+  /* Lists — more spacious */
+  .article-content ul,
+  article.prose ul {
+    @apply mb-6 pl-6 space-y-2;
+  }
+  .article-content li,
+  article.prose li {
+    @apply text-zinc-300 mb-1;
+    line-height: 1.75;
+    font-size: 1.0625rem;
+  }
+  .article-content ul li::marker,
+  article.prose ul li::marker {
+    @apply text-violet-500;
+  }
+
+  /* Inline code */
+  .article-content code,
+  article.prose code {
+    @apply font-mono text-sm bg-zinc-900 px-2 py-0.5 rounded text-violet-300;
+    border: 1px solid rgba(139, 92, 246, 0.15);
+  }
+
+  /* Code blocks */
+  .article-content pre,
+  article.prose pre {
+    @apply bg-zinc-900 rounded-xl p-5 overflow-x-auto mb-6;
+    border: 1px solid rgba(255,255,255,0.06);
+  }
+  .article-content pre code,
+  article.prose pre code {
+    @apply bg-transparent p-0 text-sm;
+    border: none;
+  }
+
+  /* Horizontal rules — section dividers */
+  .article-content hr,
+  article.prose hr {
+    @apply border-zinc-800 my-8;
+    border-image: linear-gradient(to right, transparent, rgba(139,92,246,0.3), transparent) 1;
+  }
+
+  /* Tables */
+  .article-content table,
+  article.prose table {
+    @apply w-full mb-6 text-sm;
+  }
+  .article-content th,
+  article.prose th {
+    @apply text-zinc-400 font-medium text-xs uppercase tracking-wider;
+  }
+  .article-content td,
+  article.prose td {
+    @apply text-zinc-300 py-2.5;
+  }
+  .article-content tr,
+  article.prose tr {
+    @apply border-b border-zinc-800/50;
+  }
+
+  /* Images */
+  .article-content img,
+  article.prose img {
+    @apply rounded-2xl my-8;
+  }
+
+  /* Strong / bold */
+  .article-content strong,
+  article.prose strong {
+    @apply text-white font-semibold;
+  }
+
+  /* ── Legacy article-content class (fallback) ────────────── */
   .article-content {
-    @apply text-zinc-300 leading-relaxed;
-  }
-  
-  .article-content h1 {
-    @apply text-4xl font-bold text-white mt-12 mb-6 font-display;
-  }
-  
-  .article-content h2 {
-    @apply text-2xl font-semibold text-white mt-8 mb-4 font-display;
-  }
-  
-  .article-content h3 {
-    @apply text-xl font-semibold text-white mt-6 mb-3;
-  }
-  
-  .article-content p {
-    @apply mb-4 text-zinc-300;
-  }
-  
-  .article-content a {
-    @apply text-violet-400 hover:text-violet-300 underline underline-offset-4 decoration-violet-400/50 hover:decoration-violet-300 transition-colors;
-  }
-  
-  .article-content ul, .article-content ol {
-    @apply mb-4 pl-6 space-y-2;
-  }
-  
-  .article-content ul {
-    @apply list-disc;
-  }
-  
-  .article-content ol {
-    @apply list-decimal;
-  }
-  
-  .article-content li {
     @apply text-zinc-300;
   }
-  
-  .article-content code {
-    @apply font-mono text-sm bg-zinc-900 px-2 py-1 rounded text-violet-300;
-  }
-  
-  .article-content pre {
-    @apply bg-zinc-900 rounded-lg p-4 overflow-x-auto mb-4;
-  }
-  
-  .article-content pre code {
-    @apply bg-transparent p-0;
-  }
-  
-  .article-content blockquote {
-    @apply border-l-4 border-violet-500 pl-4 italic text-zinc-400 my-4;
-  }
-  
-  .article-content img {
-    @apply rounded-lg my-6;
-  }
-  
-  .article-content hr {
-    @apply border-zinc-800 my-8;
-  }
+  .article-content p { @apply mb-6 text-zinc-300; line-height: 1.85; font-size: 1.0625rem; }
+  .article-content h1 { @apply text-3xl font-bold text-white mt-10 mb-5 font-display; }
+  .article-content h2 { @apply text-2xl font-bold text-white mt-10 mb-4 font-display; border-b border-zinc-800 pb-2; }
+  .article-content h3 { @apply text-lg font-semibold text-white/90 mt-6 mb-3; }
+  .article-content a { @apply text-violet-400 hover:text-violet-300 underline underline-offset-2 decoration-violet-400/50; font-weight: 500; }
+  .article-content ul { @apply mb-6 pl-6 space-y-2; }
+  .article-content ol { @apply mb-6 pl-6 space-y-2; }
+  .article-content li { @apply text-zinc-300 mb-1; line-height: 1.75; }
+  .article-content code { @apply font-mono text-sm bg-zinc-900 px-2 py-0.5 rounded text-violet-300; border: 1px solid rgba(139,92,246,0.15); }
+  .article-content pre { @apply bg-zinc-900 rounded-xl p-5 overflow-x-auto mb-6; border: 1px solid rgba(255,255,255,0.06); }
+  .article-content pre code { @apply bg-transparent p-0; border: none; }
+  .article-content blockquote { @apply border-l-0 rounded-xl p-5 my-6 text-zinc-300; background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.2); font-style: normal; }
+  .article-content img { @apply rounded-2xl my-8; }
+  .article-content hr { @apply border-zinc-800 my-8; }
+
   
   /* Glass effect */
   .glass {

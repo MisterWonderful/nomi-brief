@@ -1,8 +1,9 @@
 import { ArticleCard } from "@/components/ArticleCard";
 import { Button } from "@/components/ui/Button";
-import { Sparkles, TrendingUp, Clock, Star } from "lucide-react";
+import { Sparkles } from "lucide-react";
 import { prisma } from "@/lib/prisma";
-import { getInitials } from "@/lib/utils";
+import { HomeSortNav } from "@/components/search/HomeSortNav";
+import { Suspense } from "react";
 
 // Force dynamic rendering to avoid SSR issues with framer-motion
 export const dynamic = "force-dynamic";
@@ -30,7 +31,7 @@ async function getDefaultUser() {
   return prisma.user.findUnique({ where: { email: userEmail } });
 }
 
-async function getHomePageData() {
+async function getHomePageData(sort: string) {
   try {
     const user = await getDefaultUser();
 
@@ -43,10 +44,17 @@ async function getHomePageData() {
     const startOfWeek = new Date(startOfDay);
     startOfWeek.setDate(startOfWeek.getDate() - startOfWeek.getDay());
 
+    const orderBy =
+      sort === "recent"
+        ? { publishedAt: "asc" as const }
+        : sort === "favorites"
+          ? { isFavorite: "desc" as const }
+          : { publishedAt: "desc" as const };
+
     const [articles, articleCount, linkCount, todayArticles, totalReadingMinutes] = await Promise.all([
       prisma.article.findMany({
         where: { userId: user.id, isPublished: true },
-        orderBy: { publishedAt: "desc" },
+        orderBy,
         take: 10,
         select: {
           id: true,
@@ -92,8 +100,13 @@ async function getHomePageData() {
   }
 }
 
-export default async function HomePage() {
-  const { articles, stats, user } = await getHomePageData();
+export default async function HomePage({
+  searchParams,
+}: {
+  searchParams: Promise<{ sort?: string }>;
+}) {
+  const { sort } = await searchParams;
+  const { articles, stats, user } = await getHomePageData(sort || "trending");
 
   // Determine greeting based on time of day
   const hour = new Date().getHours();
@@ -156,27 +169,9 @@ export default async function HomePage() {
 
       {/* Filters */}
       <div className="flex items-center gap-4">
-        <div className="flex items-center gap-2 px-1">
-          {[
-            { icon: TrendingUp, label: "Trending" },
-            { icon: Clock, label: "Recent" },
-            { icon: Star, label: "Favorites" },
-          ].map((filter) => {
-            const Icon = filter.icon;
-            return (
-              <Button
-                key={filter.label}
-                variant={filter.label === "Trending" ? "primary" : "ghost"}
-                size="sm"
-                disabled={filter.label !== "Recent"}
-                title={filter.label !== "Recent" ? "Coming soon" : undefined}
-              >
-                <Icon className="w-4 h-4 mr-2" />
-                {filter.label}
-              </Button>
-            );
-          })}
-        </div>
+        <Suspense fallback={<div className="h-8 w-48 bg-zinc-900/50 rounded-lg animate-pulse" />}>
+          <HomeSortNav />
+        </Suspense>
         <div className="h-6 w-px bg-zinc-800" />
         <div className="flex items-center gap-2">
           {["All", "AI & Technology", "Infrastructure", "Development", "Research"].map(

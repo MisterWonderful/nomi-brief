@@ -1,12 +1,14 @@
 FROM node:20-alpine AS base
 
-# Install dependencies only when needed
+# Install all dependencies (including devDependencies needed for build)
 FROM base AS deps
 RUN apk add --no-cache libc6-compat
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-RUN npm ci
+# Unset NODE_ENV so npm ci installs devDependencies (typescript, tailwindcss, etc.)
+# These are needed for `next build` in the builder stage.
+RUN NODE_ENV=development npm ci
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -19,7 +21,7 @@ RUN npx prisma generate
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN npm run build
+RUN NODE_ENV=development npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner

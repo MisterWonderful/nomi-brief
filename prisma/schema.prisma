@@ -68,6 +68,9 @@ model Article {
   @@index([userId])
   @@index([publishedAt])
   @@index([category])
+  @@index([isPublished])
+  @@index([userId, isPublished])
+  @@index([isRead])
 }
 
 model LinkEntry {

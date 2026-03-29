@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { prisma, upsertDefaultUser } from "@/lib/prisma";
 import { calculateReadTime, extractExcerpt } from "@/lib/utils";
 
 // GET /api/articles - List all articles
@@ -14,7 +14,7 @@ export async function GET(request: NextRequest) {
     const sort = searchParams.get("sort") || "newest";
     const unreadOnly = searchParams.get("unreadOnly") === "true";
 
-    const where: any = {
+    const where: Record<string, unknown> = {
       isPublished: true,
     };
 
@@ -38,11 +38,12 @@ export async function GET(request: NextRequest) {
       where.isRead = false;
     }
 
-    const orderBy: any = {
-      newest: { publishedAt: "desc" },
-      oldest: { publishedAt: "asc" },
-      readTime: { readTime: "asc" },
-    }[sort] || { publishedAt: "desc" };
+    const orderBy =
+      sort === "oldest"
+        ? { publishedAt: "asc" as const }
+        : sort === "readTime"
+          ? { readTime: "asc" as const }
+          : { publishedAt: "desc" as const };
 
     const [articles, total] = await Promise.all([
       prisma.article.findMany({
@@ -78,32 +79,30 @@ export async function GET(request: NextRequest) {
     });
   } catch (error) {
     console.error("Error fetching articles:", error);
-    return NextResponse.json(
-      { error: "Failed to fetch articles" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to fetch articles" }, { status: 500 });
   }
 }
 
 // POST /api/articles - Create a new article
 export async function POST(request: NextRequest) {
   try {
-    // Check API secret auth — failsafe: reject if secret is configured but missing/bad
     const apiSecret = process.env.API_SECRET;
-    if (apiSecret) {
-      const authHeader = request.headers.get("authorization");
-      if (!authHeader || authHeader !== `Bearer ${apiSecret}`) {
-        return NextResponse.json(
-          { error: "Unauthorized" },
-          { status: 401 }
-        );
-      }
-    } else {
-      // No API_SECRET configured — block writes to avoid accidental public endpoint
+
+    // Fail-safe: block writes if API_SECRET is not configured
+    if (!apiSecret) {
+      console.error("API_SECRET is not configured — rejecting write request");
       return NextResponse.json(
-        { error: "API_SECRET environment variable is not configured. Cannot accept writes." },
+        {
+          error:
+            "API_SECRET environment variable is not configured. Cannot accept writes.",
+        },
         { status: 503 }
       );
+    }
+
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || authHeader !== `Bearer ${apiSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
     }
 
     const body = await request.json();
@@ -118,7 +117,6 @@ export async function POST(request: NextRequest) {
       tags = [],
       source = "ai",
       sourceUrl,
-      userId,
       publishedAt,
     } = body;
 
@@ -129,30 +127,31 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Use upsert pattern for default user to avoid unique constraint violations
-    const user = await prisma.user.upsert({
-      where: { email: "nomi@nomibrief.app" },
-      update: {},
-      create: {
-        email: "nomi@nomibrief.app",
-        name: "Ryan",
-        avatar: "https://avatars.githubusercontent.com/u/20233821?v=4",
-      },
-    });
+    // Validate content size (50KB max for articles)
+    const contentSize = new TextEncoder().encode(content).length;
+    if (contentSize > 50 * 1024) {
+      return NextResponse.json(
+        { error: "Article content exceeds maximum size of 50KB" },
+        { status: 413 }
+      );
+    }
+
+    // Use env-driven user upsert
+    const user = await upsertDefaultUser();
 
     const readTime = calculateReadTime(content);
     const excerpt = extractExcerpt(content);
 
     const article = await prisma.article.create({
       data: {
-        title,
-        subtitle: subtitle || excerpt,
+        title: title.slice(0, 500), // Enforce max length
+        subtitle: subtitle ? subtitle.slice(0, 1000) : excerpt,
         content,
-        authorName,
+        authorName: authorName.slice(0, 200),
         authorAvatar,
         coverImage,
-        category,
-        tags,
+        category: category.slice(0, 100),
+        tags: tags.slice(0, 20).map((t: string) => t.slice(0, 100)),
         readTime,
         source,
         sourceUrl,

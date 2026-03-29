@@ -8,6 +8,18 @@ import { formatDistanceToNow } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
 import rehypeHighlight from "rehype-highlight";
+import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
+
+const sanitizeSchema = {
+  ...defaultSchema,
+  // Allow safe attributes for code highlighting
+  attributes: {
+    ...defaultSchema.attributes,
+    code: [...(defaultSchema.attributes?.code || []), "className"],
+    span: [...(defaultSchema.attributes?.span || []), "className"],
+    pre: [...(defaultSchema.attributes?.pre || []), "className"],
+  },
+};
 
 interface ArticlePageProps {
   params: Promise<{ id: string }>;
@@ -29,7 +41,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
   const { id } = await params;
   const article = await getArticle(id);
 
-  if (!article) {
+  if (!article || !article.isPublished) {
     notFound();
   }
 
@@ -117,16 +129,18 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         )}
       </div>
 
-      {/* Article Content */}
-      <article className="prose prose-invert prose-zinc max-w-none">
+      {/* Article Content — sanitized markdown */}
+      <div className="prose prose-invert prose-zinc max-w-none text-zinc-300 leading-relaxed">
         <ReactMarkdown
           remarkPlugins={[remarkGfm]}
-          rehypePlugins={[rehypeHighlight]}
-          className="text-zinc-300 leading-relaxed"
+          rehypePlugins={[
+            rehypeSanitize,
+            [rehypeHighlight, { detect: true }],
+          ]}
         >
           {article.content}
         </ReactMarkdown>
-      </article>
+      </div>
 
       {/* Actions */}
       <div className="flex items-center justify-between pt-8 border-t border-zinc-800">

@@ -1,31 +1,57 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+import { createHmac, timingSafeEqual } from "crypto";
+import { prisma, upsertDefaultUser } from "@/lib/prisma";
 import { calculateReadTime, extractExcerpt } from "@/lib/utils";
+
+/**
+ * Timing-safe comparison for webhook secrets.
+ * Uses crypto.timingSafeEqual to prevent timing attacks.
+ */
+function secureCompare(a: string, b: string): boolean {
+  if (a.length !== b.length) {
+    // Still do a comparison to maintain constant time for auth failures
+    createHmac("sha256", "dummy").update(a).digest();
+    return false;
+  }
+  const bufA = Buffer.from(a);
+  const bufB = Buffer.from(b);
+  return timingSafeEqual(bufA, bufB);
+}
 
 // POST /api/webhook - Receive articles from OpenClaw
 export async function POST(request: NextRequest) {
   try {
-    const body = await request.json();
-    
-    // Validate webhook secret if configured
     const webhookSecret = process.env.WEBHOOK_SECRET;
-    const authHeader = request.headers.get("authorization");
-    
-    if (webhookSecret && authHeader !== `Bearer ${webhookSecret}`) {
-      return NextResponse.json(
-        { error: "Unauthorized" },
-        { status: 401 }
+    const authHeader = request.headers.get("authorization") || "";
+
+    // If WEBHOOK_SECRET is configured, validate it with timing-safe compare
+    if (webhookSecret) {
+      if (!authHeader || !authHeader.startsWith("Bearer ")) {
+        return NextResponse.json({ error: "Missing authorization header" }, { status: 401 });
+      }
+      const token = authHeader.slice(7); // Strip "Bearer " prefix
+      if (!secureCompare(token, webhookSecret)) {
+        return NextResponse.json({ error: "Invalid webhook secret" }, { status: 401 });
+      }
+    } else {
+      // No secret configured — log a warning but allow (for dev setups)
+      console.warn(
+        "[webhook] WEBHOOK_SECRET not configured. "
       );
     }
 
+    const body = await request.json();
     const { type, payload } = body;
 
-    // Only handle article submissions for now
+    // Only handle article submissions
     if (type !== "article") {
-      return NextResponse.json({
-        message: "Accepted but only 'article' type is supported",
-        received: true,
-      });
+      return NextResponse.json(
+        {
+          error: `Unsupported webhook type: '${type}'. Only 'article' is supported.`,
+          received: false,
+        },
+        { status: 422 }
+      );
     }
 
     const {
@@ -44,35 +70,36 @@ export async function POST(request: NextRequest) {
 
     if (!title || !content) {
       return NextResponse.json(
-        { error: "Title and content are required" },
+        { error: "Title and content are required in payload" },
         { status: 400 }
       );
     }
 
-    // Use upsert pattern for default user to avoid unique constraint violations
-    const user = await prisma.user.upsert({
-      where: { email: "nomi@nomibrief.app" },
-      update: {},
-      create: {
-        email: "nomi@nomibrief.app",
-        name: "Ryan",
-        avatar: "https://avatars.githubusercontent.com/u/20233821?v=4",
-      },
-    });
+    // Enforce content size limit (50KB max)
+    const contentSize = new TextEncoder().encode(content).length;
+    if (contentSize > 50 * 1024) {
+      return NextResponse.json(
+        { error: "Article content exceeds maximum size of 50KB" },
+        { status: 413 }
+      );
+    }
+
+    // Use env-driven user upsert
+    const user = await upsertDefaultUser();
 
     const readTime = calculateReadTime(content);
     const excerpt = extractExcerpt(content);
 
     const article = await prisma.article.create({
       data: {
-        title,
-        subtitle: subtitle || excerpt,
+        title: title.slice(0, 500),
+        subtitle: subtitle ? subtitle.slice(0, 1000) : excerpt,
         content,
-        authorName,
+        authorName: authorName.slice(0, 200),
         authorAvatar,
         coverImage,
-        category,
-        tags,
+        category: category.slice(0, 100),
+        tags: (tags || []).slice(0, 20).map((t: string) => String(t).slice(0, 100)),
         readTime,
         source,
         sourceUrl,
@@ -81,17 +108,17 @@ export async function POST(request: NextRequest) {
       },
     });
 
-    return NextResponse.json({
-      success: true,
-      message: "Article created successfully",
-      articleId: article.id,
-    }, { status: 201 });
+    return NextResponse.json(
+      {
+        success: true,
+        message: "Article created successfully",
+        articleId: article.id,
+      },
+      { status: 201 }
+    );
   } catch (error) {
     console.error("Webhook error:", error);
-    return NextResponse.json(
-      { error: "Failed to process webhook" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to process webhook" }, { status: 500 });
   }
 }
 
@@ -107,6 +134,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     status: "ok",
     message: "Nomi Brief webhook endpoint is active",
+    secured: Boolean(process.env.WEBHOOK_SECRET),
     documentation: {
       endpoint: "POST /api/webhook",
       contentType: "application/json",
@@ -114,17 +142,20 @@ export async function GET(request: NextRequest) {
         type: "article",
         payload: {
           title: "string (required)",
-          content: "string (required)",
+          content: "string (required, max 50KB)",
           subtitle: "string (optional)",
           authorName: "string (default: Nomi Vale)",
           coverImage: "string (optional)",
           category: "string (default: AI & Technology)",
-          tags: "string[] (optional)",
+          tags: "string[] (optional, max 20)",
           source: "string (default: ai)",
           sourceUrl: "string (optional)",
           publishedAt: "ISO date string (optional)",
         },
       },
+      auth: process.env.WEBHOOK_SECRET
+        ? "Bearer token required in Authorization header"
+        : "No authentication configured (set WEBHOOK_SECRET to secure)",
     },
   });
 }

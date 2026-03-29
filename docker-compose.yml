@@ -8,8 +8,11 @@ services:
     ports:
       - "3000:3000"
     environment:
-      - DATABASE_URL=postgresql://nomi:nomibrief2026@postgres:5432/nomibrief?schema=public
+      - DATABASE_URL=postgresql://nomi:nomibrief2026@postgres:5432/nomibrief?schema=public&connection_limit=10&pool_timeout=5
+      - DEFAULT_USER_EMAIL=nomi@nomibrief.app
+      - DEFAULT_USER_NAME=Ryan
       - API_SECRET=nomi-brief-api-secret-2026
+      - WEBHOOK_SECRET=nomi-brief-webhook-secret-2026
       - OPENCLAW_URL=http://host.docker.internal:18789
       - JWT_SECRET=nomi-brief-secret-key-2026
       - NEXT_PUBLIC_APP_URL=http://localhost:3000

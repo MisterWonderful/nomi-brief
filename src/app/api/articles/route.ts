@@ -64,6 +64,8 @@ export async function GET(request: NextRequest) {
           publishedAt: true,
           isRead: true,
           isFavorite: true,
+          source: true,
+          sourceUrl: true,
           createdAt: true,
         },
       }),
@@ -75,7 +77,7 @@ export async function GET(request: NextRequest) {
       total,
       page,
       pageSize,
-      hasMore: page * pageSize < total,
+      totalPages: Math.ceil(total / pageSize),
     });
   } catch (error) {
     console.error("Error fetching articles:", error);
@@ -106,66 +108,64 @@ export async function POST(request: NextRequest) {
     }
 
     const body = await request.json();
-    const {
-      title,
-      subtitle,
-      content,
-      authorName = "Nomi Vale",
-      authorAvatar,
-      coverImage,
-      category = "General",
-      tags = [],
-      source = "ai",
-      sourceUrl,
-      publishedAt,
-    } = body;
+    const { id: requestedId, ...data } = body;
 
-    if (!title || !content) {
-      return NextResponse.json(
-        { error: "Title and content are required" },
-        { status: 400 }
-      );
-    }
-
-    // Validate content size (50KB max for articles)
-    const contentSize = new TextEncoder().encode(content).length;
-    if (contentSize > 50 * 1024) {
-      return NextResponse.json(
-        { error: "Article content exceeds maximum size of 50KB" },
-        { status: 413 }
-      );
-    }
-
-    // Use env-driven user upsert
     const user = await upsertDefaultUser();
+    const readTime = calculateReadTime(data.content || "");
+    const excerpt = extractExcerpt(data.content || "");
 
-    const readTime = calculateReadTime(content);
-    const excerpt = extractExcerpt(content);
+    // Use provided ID or generate new one
+    const articleId = requestedId || undefined;
 
     const article = await prisma.article.create({
       data: {
-        title: title.slice(0, 500), // Enforce max length
-        subtitle: subtitle ? subtitle.slice(0, 1000) : excerpt,
-        content,
-        authorName: authorName.slice(0, 200),
-        authorAvatar,
-        coverImage,
-        category: category.slice(0, 100),
-        tags: tags.slice(0, 20).map((t: string) => t.slice(0, 100)),
-        readTime,
-        source,
-        sourceUrl,
+        id: articleId,
+        title: (data.title || "Untitled").slice(0, 500),
+        subtitle: data.subtitle ? data.subtitle.slice(0, 1000) : excerpt,
+        content: data.content || "",
+        authorName: (data.authorName || "Nomi Vale").slice(0, 200),
+        authorAvatar: data.authorAvatar,
+        coverImage: data.coverImage || null,
+        category: (data.category || "General").slice(0, 100),
+        tags: (data.tags || []).slice(0, 20).map((t: string) => String(t).slice(0, 100)),
+        readTime: data.readTime || readTime,
+        source: data.source || "api",
+        sourceUrl: data.sourceUrl || null,
         userId: user.id,
-        publishedAt: publishedAt ? new Date(publishedAt) : new Date(),
+        publishedAt: data.publishedAt ? new Date(data.publishedAt) : new Date(),
       },
     });
 
     return NextResponse.json({ data: article }, { status: 201 });
   } catch (error) {
     console.error("Error creating article:", error);
-    return NextResponse.json(
-      { error: "Failed to create article" },
-      { status: 500 }
-    );
+    return NextResponse.json({ error: "Failed to create article" }, { status: 500 });
+  }
+}
+
+// DELETE /api/articles?id=xxx - Delete an article
+export async function DELETE(request: NextRequest) {
+  try {
+    const apiSecret = process.env.API_SECRET;
+    if (!apiSecret) {
+      return NextResponse.json({ error: "API_SECRET not configured" }, { status: 503 });
+    }
+    const authHeader = request.headers.get("authorization");
+    if (!authHeader || authHeader !== `Bearer ${apiSecret}`) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(request.url);
+    const id = searchParams.get("id");
+    if (!id) {
+      return NextResponse.json({ error: "Article ID required" }, { status: 400 });
+    }
+
+    const user = await upsertDefaultUser();
+    await prisma.article.deleteMany({ where: { id, userId: user.id } });
+    return NextResponse.json({ success: true, message: "Article deleted" });
+  } catch (error) {
+    console.error("Error deleting article:", error);
+    return NextResponse.json({ error: "Failed to delete article" }, { status: 500 });
   }
 }

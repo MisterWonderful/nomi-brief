@@ -2,13 +2,14 @@ import type { Metadata } from "next";
 import { Inter, Playfair_Display, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import { Navigation } from "@/components/Navigation";
+import { MobileNav } from "@/components/MobileNav";
 
-const inter = Inter({ 
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-inter",
 });
 
-const playfair = Playfair_Display({ 
+const playfair = Playfair_Display({
   subsets: ["latin"],
   variable: "--font-playfair",
 });
@@ -33,11 +34,26 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans antialiased bg-[#09090b] text-zinc-100 min-h-screen`}>
-        <div className="flex min-h-screen">
-          <Navigation />
-          <main className="flex-1 ml-64">
-            <div className="max-w-5xl mx-auto px-8 py-12">
+      <body
+        className={`${inter.variable} ${playfair.variable} ${jetbrainsMono.variable} font-sans antialiased bg-[#09090b] text-zinc-100 min-h-screen`}
+      >
+        {/* Desktop sidebar */}
+        <div className="hidden md:block">
+          <div className="hidden md:flex min-h-screen">
+            <Navigation />
+            <main className="flex-1 ml-64">
+              <div className="max-w-5xl mx-auto px-6 lg:px-8 py-10">
+                {children}
+              </div>
+            </main>
+          </div>
+        </div>
+
+        {/* Mobile layout */}
+        <div className="md:hidden">
+          <MobileNav />
+          <main className="pt-16">
+            <div className="px-4 py-6 max-w-5xl mx-auto">
               {children}
             </div>
           </main>

@@ -91,18 +91,18 @@ export function ArticlesClient({ articles, total, page, pageSize, hasMore }: Art
               {page > 1 && (
                 <Link
                   href={buildPageUrl(page - 1)}
-                  className="px-4 py-2 rounded-lg bg-zinc-800 text-zinc-300 text-sm hover:bg-zinc-700 transition-colors"
+                  className="px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-zinc-800 text-zinc-300 text-xs sm:text-sm hover:bg-zinc-700 active:scale-95 transition-all"
                 >
-                  ← Previous
+                  ← Prev
                 </Link>
               )}
-              <span className="px-4 py-2 text-zinc-600 text-sm">
-                Page {page} of {totalPages}
+              <span className="px-3 py-2 text-zinc-600 text-xs sm:text-sm">
+                {page} / {totalPages}
               </span>
               {hasMore && (
                 <Link
                   href={buildPageUrl(page + 1)}
-                  className="px-4 py-2 rounded-lg bg-zinc-800 text-zinc-300 text-sm hover:bg-zinc-700 transition-colors"
+                  className="px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-zinc-800 text-zinc-300 text-xs sm:text-sm hover:bg-zinc-700 active:scale-95 transition-all"
                 >
                   Next →
                 </Link>

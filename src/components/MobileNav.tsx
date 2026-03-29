@@ -2,9 +2,8 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import { Newspaper, Link2, Settings, Mic2, Home, Menu, X } from "lucide-react";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { Newspaper, Link2, Settings, Home, Menu, X } from "lucide-react";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
@@ -15,51 +14,92 @@ const navItems = [
 
 export function MobileNav() {
   const pathname = usePathname();
-  const [open, setOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
+
+  // Close menu on route change
+  useEffect(() => { setMenuOpen(false); }, [pathname]);
+
+  // Prevent body scroll when menu is open
+  useEffect(() => {
+    if (menuOpen) {
+      document.body.style.overflow = "hidden";
+    } else {
+      document.body.style.overflow = "";
+    }
+    return () => { document.body.style.overflow = ""; };
+  }, [menuOpen]);
 
   return (
     <>
-      {/* Mobile Header */}
-      <div className="md:hidden fixed top-0 left-0 right-0 z-40 bg-zinc-950/95 backdrop-blur-xl border-b border-zinc-800/50">
-        <div className="flex items-center justify-between px-4 py-3">
-          <Link href="/" className="flex items-center gap-2.5">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
+      {/* ── Top Bar ────────────────────────────────────────────── */}
+      <header className="sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-xl border-b border-zinc-800/60">
+        <div className="flex items-center justify-between px-4 h-14">
+          {/* Logo */}
+          <Link href="/" className="flex items-center gap-2.5 group">
+            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 group-hover:shadow-lg group-hover:shadow-violet-500/30 transition-shadow">
               <span className="text-white text-xs font-bold">N</span>
             </div>
-            <span className="font-semibold text-white text-sm">Nomi Brief</span>
+            <span className="font-semibold text-white text-sm tracking-tight">Nomi Brief</span>
           </Link>
+
+          {/* Hamburger */}
           <button
-            onClick={() => setOpen(!open)}
-            className="p-2 rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/50 transition-colors"
-            aria-label="Toggle menu"
+            onClick={() => setMenuOpen(!menuOpen)}
+            className="w-9 h-9 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/70 active:bg-zinc-700/80 transition-all"
+            aria-label={menuOpen ? "Close menu" : "Open menu"}
           >
-            {open ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            {menuOpen
+              ? <X className="w-5 h-5" />
+              : <Menu className="w-5 h-5" />
+            }
           </button>
         </div>
-      </div>
 
-      {/* Mobile Menu Overlay */}
-      {open && (
-        <div className="md:hidden fixed inset-0 z-50 bg-zinc-950/98 backdrop-blur-xl pt-16">
-          <nav className="flex flex-col p-4 gap-1">
-            {navItems.map((item) => {
-              const isActive =
-                pathname === item.href ||
-                (item.href !== "/" && pathname.startsWith(item.href));
-              const Icon = item.icon;
+        {/* ── Active tab indicator ──────────────────────────────── */}
+        <div className="flex px-1">
+          {navItems.map(({ href, icon: Icon, label }) => {
+            const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
+            return (
+              <Link
+                key={href}
+                href={href}
+                className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors relative ${
+                  isActive ? "text-violet-400" : "text-zinc-600 hover:text-zinc-400"
+                }`}
+              >
+                <Icon className="w-4 h-4" />
+                <span>{label}</span>
+                {isActive && (
+                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-violet-500" />
+                )}
+              </Link>
+            );
+          })}
+        </div>
+      </header>
+
+      {/* ── Full-screen Menu Overlay ───────────────────────────── */}
+      {menuOpen && (
+        <div
+          className="fixed inset-0 z-50 bg-[#09090b]/98 backdrop-blur-xl flex flex-col"
+          style={{ top: "85px" }}
+        >
+          <nav className="flex flex-col p-4 gap-1.5">
+            {navItems.map(({ href, icon: Icon, label }) => {
+              const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
               return (
                 <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => setOpen(false)}
-                  className={`flex items-center gap-3 px-4 py-4 rounded-xl text-base transition-all ${
+                  key={href}
+                  href={href}
+                  onClick={() => setMenuOpen(false)}
+                  className={`flex items-center gap-4 px-5 py-4 rounded-xl text-base font-medium transition-all active:scale-[0.98] ${
                     isActive
-                      ? "bg-violet-500/10 text-violet-400"
-                      : "text-zinc-400 hover:text-white hover:bg-zinc-800/50"
+                      ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
+                      : "text-zinc-300 hover:text-white hover:bg-zinc-800/60"
                   }`}
                 >
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <Icon className="w-5 h-5 flex-shrink-0" />
+                  <span>{label}</span>
                 </Link>
               );
             })}

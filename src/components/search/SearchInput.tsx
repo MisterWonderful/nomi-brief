@@ -47,17 +47,14 @@ export function SearchInput({ placeholder = "Search articles...", className = ""
   return (
     <form onSubmit={handleSubmit} className={`relative flex items-center ${className}`}>
       <Search
-        className={`absolute left-3 w-4 h-4 text-zinc-500 pointer-events-none ${
-          isPending ? "animate-pulse" : ""
-        }`}
+        className={`absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500 pointer-events-none ${isPending ? "animate-pulse" : ""}`}
       />
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
-        onSubmit={handleSubmit}
         placeholder={placeholder}
-        className="w-full pl-10 pr-10 py-2 bg-zinc-900/80 border border-zinc-800 rounded-xl text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-colors"
+        className="w-full pl-10 pr-10 py-3 sm:py-2.5 bg-zinc-900/80 border border-zinc-800 rounded-xl text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-colors min-h-[44px]"
       />
       {query && (
         <button

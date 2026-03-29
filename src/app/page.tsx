@@ -116,77 +116,87 @@ export default async function HomePage({
   return (
     <div className="space-y-8">
       {/* Header */}
-      <div className="flex items-center justify-between">
+      <div className="space-y-4">
         <div>
-          <h1 className="text-4xl font-bold text-white font-display">
-            {greeting}, <span className="gradient-text">{userName}</span>
+          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white font-display leading-tight">
+            {greeting},{" "}
+            <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
+              {userName}
+            </span>
           </h1>
-          <p className="mt-2 text-zinc-400">
+          <p className="mt-1.5 text-sm text-zinc-400 md:text-base">
             Your AI-curated news and insights are ready
           </p>
         </div>
-        <Button variant="primary" size="lg" disabled title="Feature coming soon">
-          <Sparkles className="w-4 h-4 mr-2" />
-          Generate Brief
-        </Button>
+        <div className="flex justify-start">
+          <Button
+            variant="primary"
+            size="sm"
+            className="text-xs sm:text-sm"
+            disabled
+            title="Feature coming soon"
+          >
+            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" />
+            Generate Brief
+          </Button>
+        </div>
       </div>
 
-      {/* Stats — only render if we have real data */}
+      {/* Stats — 2 cols on mobile, 4 on desktop */}
       {stats && (
-        <div className="grid grid-cols-4 gap-4">
-          <div className="glass rounded-2xl p-6 hover:glow-hover transition-all duration-300">
-            <p className="text-sm text-zinc-500">Articles</p>
-            <p className="text-3xl font-bold text-white mt-1">{stats.articleCount}</p>
-            <p className="text-xs text-violet-400 mt-1">
-              {stats.todayArticles > 0 ? `+${stats.todayArticles} today` : "No new articles today"}
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
+          <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
+            <p className="text-[10px] sm:text-xs text-zinc-500">Articles</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5">{stats.articleCount}</p>
+            <p className="text-[10px] sm:text-xs text-violet-400 mt-0.5">
+              {stats.todayArticles > 0 ? `+${stats.todayArticles} today` : "No new today"}
             </p>
           </div>
-          <div className="glass rounded-2xl p-6 hover:glow-hover transition-all duration-300">
-            <p className="text-sm text-zinc-500">Links Saved</p>
-            <p className="text-3xl font-bold text-white mt-1">{stats.linkCount}</p>
-            <p className="text-xs text-zinc-600 mt-1">From articles &amp; bookmarks</p>
+          <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
+            <p className="text-[10px] sm:text-xs text-zinc-500">Links</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5">{stats.linkCount}</p>
+            <p className="text-[10px] sm:text-xs text-zinc-600 mt-0.5">Saved</p>
           </div>
-          <div className="glass rounded-2xl p-6 hover:glow-hover transition-all duration-300">
-            <p className="text-sm text-zinc-500">Reading Time</p>
-            <p className="text-3xl font-bold text-white mt-1">
+          <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
+            <p className="text-[10px] sm:text-xs text-zinc-500">Reading</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5">
               {stats.totalReadingMinutes > 0
                 ? stats.totalReadingMinutes >= 60
                   ? `${(stats.totalReadingMinutes / 60).toFixed(1)}h`
                   : `${stats.totalReadingMinutes}m`
                 : "0m"}
             </p>
-            <p className="text-xs text-zinc-600 mt-1">Today&apos;s articles</p>
+            <p className="text-[10px] sm:text-xs text-zinc-600 mt-0.5">Today</p>
           </div>
-          <div className="glass rounded-2xl p-6 hover:glow-hover transition-all duration-300">
-            <p className="text-sm text-zinc-500">Categories</p>
-            <p className="text-3xl font-bold text-white mt-1">
+          <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
+            <p className="text-[10px] sm:text-xs text-zinc-500">Topics</p>
+            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5">
               {[...new Set(articles.map((a: any) => a.category))].length || 1}
             </p>
-            <p className="text-xs text-zinc-600 mt-1">Active topics</p>
+            <p className="text-[10px] sm:text-xs text-zinc-600 mt-0.5">Active</p>
           </div>
         </div>
       )}
 
       {/* Filters */}
-      <div className="flex items-center gap-4">
+      <div className="space-y-3">
         <Suspense fallback={<div className="h-8 w-48 bg-zinc-900/50 rounded-lg animate-pulse" />}>
           <HomeSortNav />
         </Suspense>
-        <div className="h-6 w-px bg-zinc-800" />
-        <div className="flex items-center gap-2">
-          {["All", "AI & Technology", "Infrastructure", "Development", "Research"].map(
-            (category) => (
-              <Button
-                key={category}
-                variant={category === "All" ? "secondary" : "ghost"}
-                size="sm"
-                disabled
-                title="Coming soon"
-              >
-                {category}
+        <div className="h-px bg-zinc-800/60" />
+        <div className="overflow-x-auto -mx-4 px-4">
+          <div className="flex items-center gap-2 min-w-max">
+            <span className="text-[10px] text-zinc-600 uppercase tracking-wider flex-shrink-0">Category</span>
+            <div className="h-4 w-px bg-zinc-800 flex-shrink-0" />
+            <Button variant="secondary" size="sm" className="text-[10px] px-2.5 py-1 flex-shrink-0">
+              All
+            </Button>
+            {["AI & Technology", "Infrastructure", "Development", "Research"].map((cat) => (
+              <Button key={cat} variant="ghost" size="sm" disabled className="text-[10px] px-2.5 py-1 flex-shrink-0">
+                {cat}
               </Button>
-            )
-          )}
+            ))}
+          </div>
         </div>
       </div>
 

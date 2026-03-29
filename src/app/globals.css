@@ -153,3 +153,34 @@
   .delay-400 { animation-delay: 400ms; }
   .delay-500 { animation-delay: 500ms; }
 }
+
+/* ── Scrollbar utilities ─────────────────────────────────── */
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
+
+/* ── Mobile refinements ────────────────────────────────────── */
+@media screen and (max-width: 640px) {
+  /* Clamp article card font sizes */
+  .article-card-title {
+    font-size: 0.875rem;
+    line-height: 1.4;
+  }
+
+  /* Prevent layout shift from images */
+  img {
+    max-width: 100%;
+    height: auto;
+  }
+
+  /* Make tables scroll horizontally */
+  .prose table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+}

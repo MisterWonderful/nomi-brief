@@ -1,26 +1,27 @@
-import { formatDistanceToNow } from "date-fns";
+"use client";
+
 import Link from "next/link";
 import Image from "next/image";
-import { motion } from "framer-motion";
-import { Clock, Star, Bookmark, ArrowRight, Mic } from "lucide-react";
+import { Clock, Star } from "lucide-react";
+import { formatDistanceToNow } from "date-fns";
 
-// Relaxed type for ArticleCard - only requires fields it actually renders
-interface ArticleCardData {
+interface Article {
   id: string;
   title: string;
   subtitle?: string | null;
+  authorName: string;
+  authorAvatar?: string | null;
   coverImage?: string | null;
   category: string;
-  tags: string[];
+  tags?: string[];
   readTime: number;
-  publishedAt: Date | string;
-  isFavorite: boolean;
+  publishedAt: Date;
   isRead?: boolean;
-  authorName: string;
+  isFavorite?: boolean;
 }
 
 interface ArticleCardProps {
-  article: ArticleCardData;
+  article: Article;
   featured?: boolean;
 }
 
@@ -29,168 +30,164 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
 
   if (featured) {
     return (
-      <motion.div
-        whileHover={{ scale: 1.01 }}
-        transition={{ duration: 0.2 }}
-      >
-        <Link href={`/articles/${article.id}`} className="block group">
-          <article className="glass rounded-3xl overflow-hidden hover:glow-hover transition-all duration-300">
-            {/* Cover Image */}
-            <div className="relative h-80 overflow-hidden">
-              <Image
-                src={article.coverImage || "https://picsum.photos/1200/600"}
-                alt={article.title}
-                fill
-                className="object-cover transition-transform duration-500 group-hover:scale-105"
-              />
-              <div className="absolute inset-0 bg-gradient-to-t from-zinc-950 via-zinc-950/50 to-transparent" />
-              
-              {/* Category Badge */}
-              <div className="absolute top-4 left-4">
-                <span className="px-3 py-1.5 text-xs font-medium bg-violet-500/90 text-white rounded-full backdrop-blur-sm">
-                  {article.category}
-                </span>
-              </div>
-              
-              {/* Favorite */}
-              {article.isFavorite && (
-                <div className="absolute top-4 right-4">
-                  <div className="p-2 rounded-full bg-yellow-500/90 backdrop-blur-sm">
-                    <Star className="w-4 h-4 text-white fill-current" />
-                  </div>
-                </div>
-              )}
-              
-              {/* Title Overlay */}
-              <div className="absolute bottom-0 left-0 right-0 p-8">
-                <h2 className="text-3xl font-bold text-white mb-2 font-display leading-tight">
-                  {article.title}
-                </h2>
-                <p className="text-zinc-300 text-lg line-clamp-2">
+      <Link href={`/articles/${article.id}`} className="group block">
+        {/* Cover Image */}
+        {article.coverImage && (
+          <div className="relative aspect-[16/9] sm:aspect-[2.4/1] rounded-xl sm:rounded-2xl overflow-hidden mb-3 sm:mb-4">
+            <Image
+              src={article.coverImage}
+              alt={article.title}
+              fill
+              className="object-cover transition-transform duration-500 group-hover:scale-[1.02]"
+              priority
+            />
+            {/* Gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-t from-zinc-950/90 via-zinc-950/30 to-transparent" />
+
+            {/* Category badge */}
+            <span className="absolute top-3 left-3 sm:top-4 sm:left-4 px-2.5 py-1 text-[10px] sm:text-xs font-semibold bg-violet-500/90 text-white rounded-full backdrop-blur-sm">
+              {article.category}
+            </span>
+
+            {/* Favorite */}
+            {article.isFavorite && (
+              <span className="absolute top-3 right-3 sm:top-4 sm:right-4">
+                <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </span>
+            )}
+
+            {/* Title overlay at bottom */}
+            <div className="absolute bottom-0 left-0 right-0 p-3 sm:p-5">
+              <h2 className="text-base sm:text-xl md:text-2xl font-bold text-white font-display leading-tight line-clamp-2 sm:line-clamp-3">
+                {article.title}
+              </h2>
+              {article.subtitle && (
+                <p className="hidden sm:block mt-1 text-xs sm:text-sm text-zinc-300 line-clamp-1">
                   {article.subtitle}
                 </p>
-              </div>
+              )}
             </div>
+          </div>
+        )}
 
-            {/* Content */}
-            <div className="p-8">
-              {/* Meta */}
-              <div className="flex items-center gap-4 mb-4">
-                <div className="flex items-center gap-2">
-                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-sm font-medium">
-                    {article.authorName.charAt(0)}
-                  </div>
-                  <span className="text-sm text-zinc-300">{article.authorName}</span>
-                </div>
-                <span className="text-zinc-600">•</span>
-                <div className="flex items-center gap-1 text-zinc-500 text-sm">
-                  <Clock className="w-4 h-4" />
-                  <span>{article.readTime} min read</span>
-                </div>
-                <span className="text-zinc-600">•</span>
-                <span className="text-zinc-500 text-sm">{timeAgo}</span>
-              </div>
+        {/* No-image featured layout */}
+        {!article.coverImage && (
+          <div className="rounded-xl sm:rounded-2xl overflow-hidden bg-gradient-to-br from-violet-900/40 to-purple-900/30 border border-violet-500/20 p-4 sm:p-6 mb-3 sm:mb-4">
+            <span className="inline-block px-2.5 py-1 text-[10px] sm:text-xs font-semibold bg-violet-500/20 text-violet-300 rounded-full mb-2 sm:mb-3">
+              {article.category}
+            </span>
+            <h2 className="text-base sm:text-xl md:text-2xl font-bold text-white font-display leading-tight">
+              {article.title}
+            </h2>
+            {article.subtitle && (
+              <p className="hidden sm:block mt-2 text-sm text-zinc-400 line-clamp-2">
+                {article.subtitle}
+              </p>
+            )}
+          </div>
+        )}
 
-              {/* Tags */}
-              <div className="flex flex-wrap gap-2 mb-6">
-                {article.tags.map((tag) => (
-                  <span
-                    key={tag}
-                    className="px-2.5 py-1 text-xs font-medium bg-zinc-800 text-zinc-300 rounded-lg"
-                  >
-                    {tag}
-                  </span>
-                ))}
-              </div>
-
-              {/* Actions */}
-              <div className="flex items-center justify-between pt-4 border-t border-zinc-800/50">
-                <div className="flex items-center gap-2">
-                  <button 
-                    disabled
-                    className="flex items-center gap-2 px-4 py-2 rounded-xl bg-zinc-800/50 text-zinc-500 cursor-not-allowed"
-                    title="Voice feature coming soon"
-                  >
-                    <Mic className="w-4 h-4" />
-                    <span className="text-sm font-medium">Coming soon</span>
-                  </button>
-                  <button className="p-2 rounded-xl hover:bg-zinc-800 text-zinc-500 hover:text-zinc-300 transition-colors">
-                    <Bookmark className="w-5 h-5" />
-                  </button>
-                </div>
-                <span className="flex items-center gap-2 text-sm font-medium text-violet-400 group-hover:gap-3 transition-all">
-                  Read Article
-                  <ArrowRight className="w-4 h-4" />
-                </span>
-              </div>
-            </div>
-          </article>
-        </Link>
-      </motion.div>
+        {/* Meta row */}
+        <div className="flex items-center gap-x-3 gap-y-1 text-[11px] sm:text-xs text-zinc-500 flex-wrap">
+          <span className="text-zinc-400 font-medium">{article.authorName}</span>
+          <span>·</span>
+          <span>{timeAgo}</span>
+          <span>·</span>
+          <span className="flex items-center gap-1">
+            <Clock className="w-3 h-3" />
+            {article.readTime}m
+          </span>
+          {article.isFavorite && (
+            <>
+              <span>·</span>
+              <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />
+            </>
+          )}
+        </div>
+      </Link>
     );
   }
 
-  // Standard card
+  // Standard card — horizontal on desktop, vertical on mobile
   return (
-    <motion.div
-      whileHover={{ scale: 1.01 }}
-      transition={{ duration: 0.2 }}
-    >
-      <Link href={`/articles/${article.id}`} className="block group">
-        <article className="glass rounded-2xl overflow-hidden hover:glow-hover transition-all duration-300 flex">
-          {/* Cover Image */}
-          <div className="relative w-64 h-48 flex-shrink-0 overflow-hidden">
+    <Link href={`/articles/${article.id}`} className="group block">
+      <article className="flex gap-3 sm:gap-4 p-3 sm:p-4 rounded-xl sm:rounded-2xl glass hover:glow-hover transition-all duration-200">
+        {/* Cover image — small square on left */}
+        {article.coverImage ? (
+          <div className="hidden sm:block relative w-24 lg:w-32 flex-shrink-0 rounded-xl overflow-hidden">
             <Image
-              src={article.coverImage || "https://picsum.photos/400/300"}
+              src={article.coverImage}
               alt={article.title}
               fill
-              className="object-cover transition-transform duration-500 group-hover:scale-105"
+              className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
             />
-            <div className="absolute inset-0 bg-gradient-to-r from-transparent to-zinc-950/80" />
+            {/* Category overlay */}
+            <span className="absolute bottom-1 left-1 px-1.5 py-0.5 text-[9px] font-semibold bg-black/70 text-white rounded-md">
+              {article.category}
+            </span>
+          </div>
+        ) : (
+          <div className="hidden sm:flex w-24 lg:w-32 flex-shrink-0 rounded-xl bg-gradient-to-br from-violet-900/50 to-purple-900/30 items-center justify-center flex-shrink-0">
+            <span className="text-[10px] text-violet-400/60 font-medium px-2 text-center">{article.category}</span>
+          </div>
+        )}
+
+        {/* Content */}
+        <div className="flex-1 min-w-0 flex flex-col justify-between gap-1.5 sm:gap-2">
+          {/* Mobile: category above title */}
+          <div className="flex items-center gap-2 sm:hidden">
+            <span className="text-[10px] font-medium text-violet-400 bg-violet-500/10 px-2 py-0.5 rounded-full">
+              {article.category}
+            </span>
+            {article.isFavorite && <Star className="w-3 h-3 text-yellow-400 fill-yellow-400" />}
           </div>
 
-          {/* Content */}
-          <div className="flex-1 p-6 flex flex-col">
-            {/* Category & Time */}
-            <div className="flex items-center gap-3 mb-2">
-              <span className="text-xs font-medium text-violet-400">{article.category}</span>
-              <span className="text-zinc-600">•</span>
-              <span className="text-xs text-zinc-500">{timeAgo}</span>
-              {article.isFavorite && (
-                <Star className="w-3.5 h-3.5 text-yellow-400 fill-current" />
-              )}
-            </div>
-
-            {/* Title */}
-            <h3 className="text-xl font-semibold text-white mb-2 group-hover:text-violet-300 transition-colors line-clamp-1">
+          <div>
+            <h3 className="text-sm sm:text-base font-semibold text-white leading-snug line-clamp-2 group-hover:text-violet-300 transition-colors">
               {article.title}
             </h3>
-
-            {/* Subtitle */}
-            <p className="text-zinc-400 text-sm line-clamp-2 flex-1">
-              {article.subtitle}
-            </p>
-
-            {/* Footer */}
-            <div className="flex items-center justify-between mt-4 pt-4 border-t border-zinc-800/50">
-              <div className="flex items-center gap-2">
-                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white text-xs font-medium">
-                  {article.authorName.charAt(0)}
-                </div>
-                <span className="text-xs text-zinc-500">{article.readTime} min read</span>
-              </div>
-              <button 
-                disabled
-                className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800/50 text-zinc-500 text-xs font-medium cursor-not-allowed"
-                title="Voice feature coming soon"
-              >
-                <Mic className="w-3.5 h-3.5" />
-                Soon
-              </button>
-            </div>
+            {article.subtitle && (
+              <p className="hidden md:block mt-1 text-xs text-zinc-500 line-clamp-1">
+                {article.subtitle}
+              </p>
+            )}
           </div>
-        </article>
-      </Link>
-    </motion.div>
+
+          {/* Tags on mobile */}
+          {article.tags && article.tags.length > 0 && (
+            <div className="flex gap-1.5 overflow-x-auto scrollbar-hide sm:hidden">
+              {article.tags.slice(0, 3).map((tag) => (
+                <span
+                  key={tag}
+                  className="text-[9px] text-zinc-600 bg-zinc-800/60 px-1.5 py-0.5 rounded-md whitespace-nowrap"
+                >
+                  {tag}
+                </span>
+              ))}
+            </div>
+          )}
+
+          {/* Meta row */}
+          <div className="flex items-center gap-x-2 text-[10px] sm:text-xs text-zinc-500">
+            <span className="text-zinc-400 font-medium truncate max-w-[80px] sm:max-w-none">
+              {article.authorName}
+            </span>
+            <span className="hidden sm:inline">·</span>
+            <span className="hidden sm:inline">{timeAgo}</span>
+            <span>·</span>
+            <span className="flex items-center gap-1">
+              <Clock className="w-3 h-3 flex-shrink-0" />
+              {article.readTime}m
+            </span>
+            {article.isFavorite && (
+              <>
+                <span>·</span>
+                <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 flex-shrink-0" />
+              </>
+            )}
+          </div>
+        </div>
+      </article>
+    </Link>
   );
 }

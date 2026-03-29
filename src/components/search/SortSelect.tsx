@@ -44,21 +44,23 @@ export function SortSelect({ className = "" }: SortSelectProps) {
   );
 
   return (
-    <div className={`flex items-center gap-1 ${isPending ? "opacity-60" : ""} ${className}`}>
-      <ArrowUpDown className="w-4 h-4 text-zinc-500 mr-2" />
-      {SORT_OPTIONS.map((opt) => (
-        <button
-          key={opt}
-          onClick={() => updateSort(opt)}
-          className={`px-3 py-1.5 rounded-lg text-xs font-medium transition-colors ${
-            currentSort === opt
-              ? "bg-violet-500/20 text-violet-400 border border-violet-500/30"
-              : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"
-          }`}
-        >
-          {SORT_LABELS[opt]}
-        </button>
-      ))}
+    <div className={`flex items-center gap-1 ${isPending ? "opacity-60" : ""}`}>
+      <ArrowUpDown className="w-3.5 h-3.5 sm:w-4 sm:h-4 text-zinc-500 flex-shrink-0" />
+      <div className="flex items-center gap-1 overflow-x-auto scrollbar-hide">
+        {SORT_OPTIONS.map((opt) => (
+          <button
+            key={opt}
+            onClick={() => updateSort(opt)}
+            className={`px-2.5 py-1.5 sm:px-3 sm:py-1.5 rounded-lg text-[11px] sm:text-xs font-medium transition-colors whitespace-nowrap ${
+              currentSort === opt
+                ? "bg-violet-500/20 text-violet-400 border border-violet-500/30"
+                : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-800/50"
+            }`}
+          >
+            {SORT_LABELS[opt]}
+          </button>
+        ))}
+      </div>
     </div>
   );
 }

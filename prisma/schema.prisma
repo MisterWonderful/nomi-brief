@@ -49,6 +49,8 @@ model Article {
   // Status
   isRead      Boolean @default(false)
   isFavorite  Boolean @default(false)
+  isSaved     Boolean @default(false)
+  savedAt     DateTime?
   isPublished Boolean @default(true)
   
   // Source tracking

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { Clock, Star, Trash2 } from "lucide-react";
+import { Clock, Star, Trash2, Bookmark } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import { useState } from "react";
 
@@ -20,6 +20,7 @@ interface Article {
   publishedAt: Date;
   isRead?: boolean;
   isFavorite?: boolean;
+  isSaved?: boolean;
 }
 
 interface ArticleCardProps {
@@ -31,6 +32,23 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
   const router = useRouter();
   const timeAgo = formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true });
   const [deleting, setDeleting] = useState(false);
+  const [saved, setSaved] = useState(article.isSaved ?? false);
+
+  async function handleSave(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    try {
+      const res = await fetch("/api/articles/saved", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: article.id }),
+      });
+      if (res.ok) {
+        const data = await res.json();
+        setSaved(data.isSaved);
+      }
+    } catch { /* silent */ }
+  }
 
   async function handleDelete(e: React.MouseEvent) {
     e.preventDefault();
@@ -80,8 +98,15 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
 
             {/* Favorite */}
             {article.isFavorite && (
-              <span className="absolute top-3 right-3 sm:top-4 sm:right-4">
+              <span className="absolute top-3 right-3 sm:top-4 sm:right-12">
                 <Star className="w-4 h-4 text-yellow-400 fill-yellow-400" />
+              </span>
+            )}
+
+            {/* Saved */}
+            {(saved || article.isSaved) && (
+              <span className="absolute top-3 right-3 sm:top-4 sm:right-4">
+                <Bookmark className="w-4 h-4 text-violet-400 fill-violet-400" />
               </span>
             )}
 
@@ -214,6 +239,21 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
                 <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 flex-shrink-0" />
               </>
             )}
+            {/* Save / Bookmark button */}
+            <span>
+              <button
+                onClick={handleSave}
+                className={`p-1 rounded-md transition-colors ${
+                  saved
+                    ? "text-violet-400 hover:text-violet-300 hover:bg-violet-500/10"
+                    : "text-zinc-600 hover:text-violet-400 hover:bg-violet-500/10"
+                }`}
+                title={saved ? "Saved for later" : "Save for later"}
+              >
+                <Bookmark className={`w-3.5 h-3.5 ${saved ? "fill-current" : ""}`} />
+              </button>
+            </span>
+
             {/* Delete button */}
             <span className="ml-auto">
               <button

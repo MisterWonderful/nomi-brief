@@ -9,12 +9,14 @@ import {
   Settings, 
   Mic2, 
   Sparkles,
-  Home 
+  Home,
+  Bookmark 
 } from "lucide-react";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
   { href: "/articles", icon: Newspaper, label: "Articles" },
+  { href: "/saved", icon: Bookmark, label: "Saved" },
   { href: "/links", icon: Link2, label: "Links" },
   { href: "/settings", icon: Settings, label: "Settings" },
 ];

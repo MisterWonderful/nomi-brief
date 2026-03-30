@@ -1,4 +1,6 @@
 /** @type {import('next').NextConfig} */
+const path = require('path');
+
 const nextConfig = {
   output: 'standalone',
   images: {
@@ -8,6 +10,14 @@ const nextConfig = {
         hostname: '**',
       },
     ],
+  },
+  webpack(config) {
+    // Ensure @/ alias works in all routes including API
+    config.resolve.alias = {
+      ...config.resolve.alias,
+      '@': path.resolve(__dirname, 'src'),
+    };
+    return config;
   },
   async rewrites() {
     return [

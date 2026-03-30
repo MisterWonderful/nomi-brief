@@ -7,11 +7,11 @@ import { ArrowLeft, Clock, Star, Mic, Calendar, Tag, BookOpen, Bookmark } from "
 import { formatDistanceToNow } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
-import rehypeHighlight from "rehype-highlight";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { preprocessYouTubeUrls } from "@/lib/rehype-youtube";
 import { SourceLink, ArticleProgress } from "@/components/article";
 import { DigestEntryCard } from "@/components/DigestEntryCard";
+
 
 const sanitizeSchema = {
   ...defaultSchema,
@@ -182,7 +182,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         <article className="prose prose-invert prose-zinc prose-sm sm:prose-base md:prose-lg max-w-none">
           <ReactMarkdown
             remarkPlugins={[remarkGfm]}
-            rehypePlugins={[rehypeSanitize, [rehypeHighlight, { detect: true }]]}
+            rehypePlugins={[[rehypeSanitize, sanitizeSchema]]}
           >
             {preprocessYouTubeUrls(article.content)}
           </ReactMarkdown>

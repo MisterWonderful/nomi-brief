@@ -58,6 +58,8 @@ export async function POST(request: NextRequest) {
       title,
       subtitle,
       content,
+      contentHtml,
+      entries,
       authorName = "Nomi Vale",
       authorAvatar,
       coverImage,
@@ -90,11 +92,24 @@ export async function POST(request: NextRequest) {
     const readTime = calculateReadTime(content);
     const excerpt = extractExcerpt(content);
 
+    // Enforce contentHtml size limit (50KB max) if present
+    if (contentHtml) {
+      const htmlSize = new TextEncoder().encode(contentHtml).length;
+      if (htmlSize > 50 * 1024) {
+        return NextResponse.json(
+          { error: "Article contentHtml exceeds maximum size of 50KB" },
+          { status: 413 }
+        );
+      }
+    }
+
     const article = await prisma.article.create({
       data: {
         title: title.slice(0, 500),
         subtitle: subtitle ? subtitle.slice(0, 1000) : excerpt,
         content,
+        contentHtml: contentHtml || null,
+        entries: entries ? JSON.stringify(entries).slice(0, 50000) : null,
         authorName: authorName.slice(0, 200),
         authorAvatar,
         coverImage,

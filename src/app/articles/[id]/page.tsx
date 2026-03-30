@@ -3,7 +3,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { prisma } from "@/lib/prisma";
 import { Button } from "@/components/ui/Button";
-import { ArrowLeft, Clock, Star, Mic, Calendar, Tag, BookOpen } from "lucide-react";
+import { ArrowLeft, Clock, Star, Mic, Calendar, Tag, BookOpen, Bookmark } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
 import ReactMarkdown from "react-markdown";
 import remarkGfm from "remark-gfm";
@@ -11,6 +11,7 @@ import rehypeHighlight from "rehype-highlight";
 import rehypeSanitize, { defaultSchema } from "rehype-sanitize";
 import { preprocessYouTubeUrls } from "@/lib/rehype-youtube";
 import { SourceLink, ArticleProgress } from "@/components/article";
+import { DigestEntryCard } from "@/components/DigestEntryCard";
 
 const sanitizeSchema = {
   ...defaultSchema,
@@ -55,12 +56,32 @@ async function getArticle(id: string) {
   }
 }
 
+interface DigestEntry {
+  title: string;
+  description?: string;
+  url?: string;
+  source?: string;
+  date?: string;
+  tags?: string[];
+  image?: string | null;
+}
+
 export default async function ArticlePage({ params }: ArticlePageProps) {
   const { id } = await params;
   const article = await getArticle(id);
   if (!article || !article.isPublished) notFound();
 
   const timeAgo = formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true });
+
+  // Parse structured entries if present (for digest articles)
+  let entries: DigestEntry[] = [];
+  if (article.entries) {
+    try {
+      entries = JSON.parse(article.entries) as DigestEntry[];
+    } catch {
+      entries = [];
+    }
+  }
 
   return (
     <>
@@ -173,6 +194,27 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             className="mt-6 p-4 sm:p-6 rounded-xl bg-zinc-900/50 border border-zinc-800/50"
             dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.contentHtml) }}
           />
+        )}
+
+        {/* Digest entries — each story is a saveable card */}
+        {entries.length > 0 && (
+          <section className="space-y-4">
+            <div className="flex items-center gap-3">
+              <div className="flex-1 h-px bg-zinc-800/60" />
+              <h2 className="text-xs font-semibold uppercase tracking-widest text-zinc-600 px-2">
+                {entries.length} Stories
+              </h2>
+              <div className="flex-1 h-px bg-zinc-800/60" />
+            </div>
+            <p className="text-xs text-zinc-600 text-center -mt-2">
+              Bookmark any story below to save it to a list
+            </p>
+            <div className="flex flex-col gap-2">
+              {entries.map((entry, i) => (
+                <DigestEntryCard key={i} entry={entry} index={i + 1} />
+              ))}
+            </div>
+          </section>
         )}
 
         {/* Source link */}

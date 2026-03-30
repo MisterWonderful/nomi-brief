@@ -62,7 +62,10 @@ model Article {
   sourceUrl   String?
   
   // Rich content (agents can push HTML content with YouTube embeds, etc.)
-  contentHtml  String?   @db.Text
+  contentHtml     String?   @db.Text
+  // Structured entries for digest articles — each entry is independently saveable
+  // Stored as JSON array: [{title, description, url, source, date, tags, image}]
+  entries       String?   @db.Text
   
   // Relations
   userId      String

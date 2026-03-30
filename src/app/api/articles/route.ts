@@ -67,6 +67,7 @@ export async function GET(request: NextRequest) {
           source: true,
           sourceUrl: true,
           createdAt: true,
+          entries: true,
         },
       }),
       prisma.article.count({ where }),

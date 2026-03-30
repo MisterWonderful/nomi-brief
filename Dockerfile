@@ -1,14 +1,12 @@
-FROM node:20-alpine AS base
+FROM node:20-slim AS base
 
 # Install all dependencies (including devDependencies needed for build)
 FROM base AS deps
-RUN apk add --no-cache libc6-compat
+RUN apt-get -y update && apt-get -y install --no-install-recommends python3 make g++ && rm -rf /var/lib/apt/lists/*
 WORKDIR /app
 
 COPY package.json package-lock.json* ./
-# Unset NODE_ENV so npm ci installs devDependencies (typescript, tailwindcss, etc.)
-# These are needed for `next build` in the builder stage.
-RUN NODE_ENV=development npm ci
+RUN npm ci --include=dev
 
 # Rebuild the source code only when needed
 FROM base AS builder
@@ -21,7 +19,7 @@ RUN npx prisma generate
 
 ENV NEXT_TELEMETRY_DISABLED 1
 
-RUN NODE_ENV=development npm run build
+RUN npm run build
 
 # Production image, copy all the files and run next
 FROM base AS runner
@@ -29,6 +27,8 @@ WORKDIR /app
 
 ENV NODE_ENV production
 ENV NEXT_TELEMETRY_DISABLED 1
+
+RUN apt-get -y update && apt-get -y install --no-install-recommends ca-certificates && rm -rf /var/lib/apt/lists/*
 
 RUN addgroup --system --gid 1001 nodejs
 RUN adduser --system --uid 1001 nextjs

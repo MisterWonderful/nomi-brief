@@ -42,14 +42,14 @@ function DateSeparator({ date }: { date: Date }) {
   }
 
   return (
-    <div className="flex items-center gap-3 py-2">
-      <div className="flex-1 h-px bg-zinc-800/60" />
-      <span className={`text-[10px] font-semibold uppercase tracking-widest px-2 ${
-        isTodayDate ? "text-emerald-400/80" : "text-zinc-600"
+    <div className="flex items-center gap-3 py-3">
+      <div className="flex-1 h-px bg-zinc-800/40" />
+      <span className={`text-[10px] font-medium uppercase tracking-wider px-2 ${
+        isTodayDate ? "text-emerald-400/70" : "text-zinc-600"
       }`}>
         {label}
       </span>
-      <div className="flex-1 h-px bg-zinc-800/60" />
+      <div className="flex-1 h-px bg-zinc-800/40" />
     </div>
   );
 }

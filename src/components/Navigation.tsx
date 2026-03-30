@@ -2,17 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { motion } from "framer-motion";
-import { 
-  Newspaper, 
-  Link2, 
-  Settings, 
-  Mic2, 
-  Sparkles,
-  Home,
-  Bookmark,
-  List 
-} from "lucide-react";
+import { Newspaper, Link2, Settings, Home, Bookmark, List } from "lucide-react";
 
 const navItems = [
   { href: "/", icon: Home, label: "Home" },
@@ -27,49 +17,41 @@ export function Navigation() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed left-0 top-0 h-screen w-64 bg-zinc-950/80 backdrop-blur-xl border-r border-zinc-800/50 flex flex-col">
+    <nav className="fixed left-0 top-0 h-screen w-[220px] bg-black border-r border-zinc-800/80 flex flex-col">
       {/* Logo */}
-      <div className="p-6 border-b border-zinc-800/50">
-        <Link href="/" className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center">
-            <Sparkles className="w-5 h-5 text-white" />
+      <div className="px-5 py-5 border-b border-zinc-800/60">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-lg bg-violet-500/20 border border-violet-500/30 flex items-center justify-center">
+            <svg width="14" height="14" viewBox="0 0 14 14" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M7 1L8.5 5.5H13L9.5 8L11 12.5L7 10L3 12.5L4.5 8L1 5.5H5.5L7 1Z" fill="#a78bfa" />
+            </svg>
           </div>
-          <div>
-            <h1 className="font-semibold text-white">Nomi Brief</h1>
-            <p className="text-xs text-zinc-500">AI News Platform</p>
-          </div>
-        </Link>
+          <span className="text-sm font-semibold text-white tracking-tight">Nomi Brief</span>
+        </div>
       </div>
 
       {/* Nav Items */}
-      <div className="flex-1 py-6 px-3">
-        <ul className="space-y-1">
+      <div className="flex-1 py-4 px-3">
+        <ul className="space-y-0.5">
           {navItems.map((item) => {
-            const isActive = pathname === item.href || 
+            const isActive = pathname === item.href ||
               (item.href !== "/" && pathname.startsWith(item.href));
             const Icon = item.icon;
-            
+
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   className={`
-                    flex items-center gap-3 px-4 py-3 rounded-xl transition-all duration-200
-                    ${isActive 
-                      ? "bg-violet-500/10 text-violet-400" 
-                      : "text-zinc-400 hover:text-zinc-200 hover:bg-zinc-800/50"
+                    flex items-center gap-2.5 px-3 py-2 rounded-lg text-[13px] transition-all duration-100
+                    ${isActive
+                      ? "bg-zinc-800/70 text-white font-medium"
+                      : "text-zinc-500 hover:text-zinc-300 hover:bg-zinc-900/60"
                     }
                   `}
                 >
-                  {isActive && (
-                    <motion.div
-                      layoutId="activeNav"
-                      className="absolute left-0 w-1 h-8 bg-violet-500 rounded-r-full"
-                      transition={{ type: "spring", stiffness: 500, damping: 30 }}
-                    />
-                  )}
-                  <Icon className="w-5 h-5" />
-                  <span className="font-medium">{item.label}</span>
+                  <Icon className="w-4 h-4 flex-shrink-0" />
+                  <span>{item.label}</span>
                 </Link>
               </li>
             );
@@ -77,28 +59,14 @@ export function Navigation() {
         </ul>
       </div>
 
-      {/* Voice Indicator */}
-      <div className="p-4 border-t border-zinc-800/50">
-        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-zinc-800/50 text-zinc-400">
-          <div className="relative">
-            <Mic2 className="w-5 h-5" />
-          </div>
-          <div className="flex-1">
-            <p className="text-sm font-medium">Voice</p>
-            <p className="text-xs text-zinc-500">Coming soon</p>
-          </div>
-        </div>
-      </div>
-
       {/* User */}
-      <div className="p-4 border-t border-zinc-800/50">
-        <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center text-white font-medium">
+      <div className="px-4 py-4 border-t border-zinc-800/60">
+        <div className="flex items-center gap-2.5">
+          <div className="w-7 h-7 rounded-full bg-zinc-800 border border-zinc-700/50 flex items-center justify-center text-zinc-400 text-xs font-medium">
             R
           </div>
           <div className="flex-1 min-w-0">
-            <p className="text-sm font-medium text-white truncate">Ryan</p>
-            <p className="text-xs text-zinc-500 truncate">@MisterWonderful</p>
+            <p className="text-xs font-medium text-zinc-300 truncate">Ryan</p>
           </div>
         </div>
       </div>

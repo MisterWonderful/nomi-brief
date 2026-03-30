@@ -1,8 +1,8 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useState, useEffect } from "react";
 import { Newspaper, Link2, Settings, Home, Menu, X, Bookmark, List } from "lucide-react";
 
 const navItems = [
@@ -16,98 +16,66 @@ const navItems = [
 
 export function MobileNav() {
   const pathname = usePathname();
-  const [menuOpen, setMenuOpen] = useState(false);
-
-  // Close menu on route change
-  useEffect(() => { setMenuOpen(false); }, [pathname]);
-
-  // Prevent body scroll when menu is open
-  useEffect(() => {
-    if (menuOpen) {
-      document.body.style.overflow = "hidden";
-    } else {
-      document.body.style.overflow = "";
-    }
-    return () => { document.body.style.overflow = ""; };
-  }, [menuOpen]);
+  const [open, setOpen] = useState(false);
 
   return (
-    <>
-      {/* ── Top Bar ────────────────────────────────────────────── */}
-      <header className="sticky top-0 z-40 bg-[#09090b]/95 backdrop-blur-xl border-b border-zinc-800/60">
-        <div className="flex items-center justify-between px-4 h-14">
-          {/* Logo */}
-          <Link href="/" className="flex items-center gap-2.5 group">
-            <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center flex-shrink-0 group-hover:shadow-lg group-hover:shadow-violet-500/30 transition-shadow">
-              <span className="text-white text-xs font-bold">N</span>
-            </div>
-            <span className="font-semibold text-white text-sm tracking-tight">Nomi Brief</span>
-          </Link>
+    <nav className="fixed bottom-0 left-0 right-0 z-50 bg-black border-t border-zinc-800/80 md:hidden">
+      {/* Mobile toggle */}
+      <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-800/60">
+        <span className="text-xs font-medium text-zinc-500">Navigation</span>
+        <button
+          onClick={() => setOpen(!open)}
+          className="p-1 rounded text-zinc-500 hover:text-zinc-300"
+        >
+          {open ? <X className="w-4 h-4" /> : <Menu className="w-4 h-4" />}
+        </button>
+      </div>
 
-          {/* Hamburger */}
-          <button
-            onClick={() => setMenuOpen(!menuOpen)}
-            className="w-9 h-9 flex items-center justify-center rounded-lg text-zinc-400 hover:text-white hover:bg-zinc-800/70 active:bg-zinc-700/80 transition-all"
-            aria-label={menuOpen ? "Close menu" : "Open menu"}
-          >
-            {menuOpen
-              ? <X className="w-5 h-5" />
-              : <Menu className="w-5 h-5" />
-            }
-          </button>
-        </div>
-
-        {/* ── Active tab indicator ──────────────────────────────── */}
-        <div className="flex px-1">
-          {navItems.map(({ href, icon: Icon, label }) => {
-            const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
+      {/* Expanded menu */}
+      {open && (
+        <div className="bg-black border-t border-zinc-800/60">
+          {navItems.map((item) => {
+            const isActive = pathname === item.href ||
+              (item.href !== "/" && pathname.startsWith(item.href));
+            const Icon = item.icon;
             return (
               <Link
-                key={href}
-                href={href}
-                className={`flex-1 flex flex-col items-center gap-0.5 py-2 text-[10px] font-medium transition-colors relative ${
-                  isActive ? "text-violet-400" : "text-zinc-600 hover:text-zinc-400"
-                }`}
+                key={item.href}
+                href={item.href}
+                onClick={() => setOpen(false)}
+                className={`
+                  flex items-center gap-3 px-5 py-3 text-sm border-b border-zinc-900/80 transition-colors
+                  ${isActive ? "text-white" : "text-zinc-500 hover:text-zinc-300"}
+                `}
               >
                 <Icon className="w-4 h-4" />
-                <span>{label}</span>
-                {isActive && (
-                  <span className="absolute bottom-0 left-1/2 -translate-x-1/2 w-8 h-0.5 rounded-full bg-violet-500" />
-                )}
+                {item.label}
               </Link>
             );
           })}
         </div>
-      </header>
-
-      {/* ── Full-screen Menu Overlay ───────────────────────────── */}
-      {menuOpen && (
-        <div
-          className="fixed inset-0 z-50 bg-[#09090b]/98 backdrop-blur-xl flex flex-col"
-          style={{ top: "85px" }}
-        >
-          <nav className="flex flex-col p-4 gap-1.5">
-            {navItems.map(({ href, icon: Icon, label }) => {
-              const isActive = href === "/" ? pathname === "/" : pathname.startsWith(href);
-              return (
-                <Link
-                  key={href}
-                  href={href}
-                  onClick={() => setMenuOpen(false)}
-                  className={`flex items-center gap-4 px-5 py-4 rounded-xl text-base font-medium transition-all active:scale-[0.98] ${
-                    isActive
-                      ? "bg-violet-500/10 text-violet-400 border border-violet-500/20"
-                      : "text-zinc-300 hover:text-white hover:bg-zinc-800/60"
-                  }`}
-                >
-                  <Icon className="w-5 h-5 flex-shrink-0" />
-                  <span>{label}</span>
-                </Link>
-              );
-            })}
-          </nav>
-        </div>
       )}
-    </>
+
+      {/* Tab bar */}
+      <div className="flex items-center justify-around py-2 px-2">
+        {navItems.slice(0, 5).map((item) => {
+          const isActive = pathname === item.href ||
+            (item.href !== "/" && pathname.startsWith(item.href));
+          const Icon = item.icon;
+          return (
+            <Link
+              key={item.href}
+              href={item.href}
+              className={`
+                flex flex-col items-center gap-0.5 px-3 py-1.5 rounded-lg text-[10px] transition-colors
+                ${isActive ? "text-white" : "text-zinc-600"}
+              `}
+            >
+              <Icon className="w-4 h-4" />
+            </Link>
+          );
+        })}
+      </div>
+    </nav>
   );
 }

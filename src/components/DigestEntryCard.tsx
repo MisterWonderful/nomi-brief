@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Image from "next/image";
-import { ExternalLink, Bookmark, Clock } from "lucide-react";
+import { ExternalLink, Bookmark } from "lucide-react";
 import { SaveToListModal } from "./lists/SaveToListModal";
 import { formatDistanceToNow } from "date-fns";
 
@@ -28,62 +28,57 @@ export function DigestEntryCard({ entry, index }: DigestEntryCardProps) {
 
   return (
     <>
-      <article className="group flex gap-3 p-3 rounded-xl glass hover:glow-hover transition-all duration-200">
-        {/* Index badge */}
-        <div className="flex-shrink-0 w-7 h-7 rounded-full bg-violet-500/20 border border-violet-500/30 flex items-center justify-center mt-0.5">
-          <span className="text-[10px] font-bold text-violet-400">{index}</span>
+      <article className="group flex gap-3 p-3 rounded-lg border border-transparent hover:border-zinc-700/50 hover:bg-zinc-900/40 transition-all duration-150">
+        {/* Index */}
+        <div className="flex-shrink-0 w-6 h-6 rounded-full bg-zinc-800 border border-zinc-700/50 flex items-center justify-center mt-0.5">
+          <span className="text-[10px] font-medium text-zinc-500">{index}</span>
         </div>
 
-        {/* Left: Optional image */}
+        {/* Optional image */}
         {entry.image && !imgError && (
-          <div className="relative w-[72px] h-[72px] flex-shrink-0 rounded-lg overflow-hidden bg-zinc-900">
+          <div className="relative w-[64px] h-[64px] flex-shrink-0 rounded-md overflow-hidden bg-zinc-900">
             <Image
               src={entry.image}
-              alt={entry.title}
+              alt=""
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
-              sizes="72px"
+              className="object-cover"
+              sizes="64px"
               onError={() => setImgError(true)}
             />
           </div>
         )}
 
         {/* Content */}
-        <div className="flex-1 min-w-0 flex flex-col justify-between gap-1.5">
-          <div className="flex items-start justify-between gap-2">
-            <div className="flex-1 min-w-0">
-              <h3 className="text-[13px] sm:text-sm font-semibold text-white leading-snug line-clamp-2 group-hover:text-violet-300 transition-colors">
-                {entry.url ? (
-                  <a href={entry.url} target="_blank" rel="noopener noreferrer" className="hover:underline decoration-violet-500/50">
-                    {entry.title}
-                  </a>
-                ) : (
-                  entry.title
-                )}
-              </h3>
-            </div>
+        <div className="flex-1 min-w-0 flex flex-col justify-between gap-1">
+          <div>
+            <h3 className="text-[13px] font-medium text-white leading-snug line-clamp-2 group-hover:text-violet-300 transition-colors">
+              {entry.url ? (
+                <a href={entry.url} target="_blank" rel="noopener noreferrer" className="hover:underline">
+                  {entry.title}
+                </a>
+              ) : (
+                entry.title
+              )}
+            </h3>
+            {entry.description && (
+              <p className="text-[11px] text-zinc-500 line-clamp-1.5 leading-relaxed mt-0.5">
+                {entry.description}
+              </p>
+            )}
           </div>
 
-          {entry.description && (
-            <p className="text-[11px] sm:text-xs text-zinc-500 line-clamp-2 leading-relaxed">
-              {entry.description}
-            </p>
-          )}
-
-          {/* Meta row */}
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-x-2 text-[10px] text-zinc-600">
+            <div className="flex items-center gap-x-1.5 text-[11px] text-zinc-600">
               {entry.source && <span>{entry.source}</span>}
               {date && <><span>·</span><span>{date}</span></>}
             </div>
-
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-0.5">
               {entry.url && (
                 <a
                   href={entry.url}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="p-1.5 rounded-lg text-zinc-600 hover:text-zinc-300 hover:bg-zinc-800 transition-all"
+                  className="p-1 rounded text-zinc-600 hover:text-zinc-300 transition-colors"
                   title="Open source"
                   onClick={(e) => e.stopPropagation()}
                 >
@@ -92,7 +87,7 @@ export function DigestEntryCard({ entry, index }: DigestEntryCardProps) {
               )}
               <button
                 onClick={() => setShowModal(true)}
-                className="p-1.5 rounded-lg text-zinc-600 hover:text-violet-400 hover:bg-violet-500/10 transition-all"
+                className="p-1 rounded text-zinc-600 hover:text-violet-400 transition-colors"
                 title="Save to list"
               >
                 <Bookmark className="w-3.5 h-3.5" />

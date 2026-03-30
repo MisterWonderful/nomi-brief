@@ -15,6 +15,8 @@ model User {
   settings  Settings?
   articles  Article[]
   links     LinkEntry[]
+  lists     List[]
+  listItems ListItem[]
   createdAt DateTime @default(now())
   updatedAt DateTime @updatedAt
 }
@@ -57,12 +59,16 @@ model Article {
   source      String?  @default("ai")
   sourceUrl   String?
   
+  // Rich content (agents can push HTML content with YouTube embeds, etc.)
+  contentHtml  String?   @db.Text
+  
   // Relations
   userId      String
   user        User    @relation(fields: [userId], references: [id], onDelete: Cascade)
   
   links       LinkEntry[]
   voiceSessions VoiceSession[]
+  listItems   ListItem[]
   
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
@@ -143,4 +149,42 @@ model DailyBrief {
   createdAt   DateTime @default(now())
   
   @@index([date])
+}
+
+model List {
+  id          String     @id @default(cuid())
+  name        String
+  description String?
+  color       String     @default("violet")
+  icon        String     @default("bookmark")
+  sortOrder   Int        @default(0)
+  userId      String
+  user        User       @relation(fields: [userId], references: [id], onDelete: Cascade)
+  items       ListItem[]
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @updatedAt
+  @@index([userId])
+}
+
+model ListItem {
+  id              String    @id @default(cuid())
+  title           String
+  description     String?
+  url             String?
+  image           String?
+  notes           String?   @db.Text
+  tags            String[]
+  youtubeUrl      String?
+  richContent     String?   @db.Text
+  sourceArticleId String?
+  sourceArticle   Article?  @relation(fields: [sourceArticleId], references: [id], onDelete: SetNull)
+  sourceUrl       String?
+  listId          String
+  list            List      @relation(fields: [listId], references: [id], onDelete: Cascade)
+  userId          String
+  user            User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  createdAt       DateTime  @default(now())
+  updatedAt       DateTime  @updatedAt
+  @@index([listId])
+  @@index([userId])
 }

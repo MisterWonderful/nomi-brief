@@ -2,9 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Clock } from "lucide-react";
+import { Clock, Bookmark } from "lucide-react";
 import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
 import { useState } from "react";
+import { SaveToListModal } from "./lists/SaveToListModal";
 
 interface Article {
   id: string;
@@ -49,14 +50,15 @@ function CategoryGradient({ category }: { category: string }) {
 
 export function ArticleCard({ article }: ArticleCardProps) {
   const [imgError, setImgError] = useState(false);
+  const [showModal, setShowModal] = useState(false);
   const pubDate = new Date(article.publishedAt);
   const timeAgo = formatDistanceToNow(pubDate, { addSuffix: true });
   const showTodayBadge = isToday(pubDate);
   const showYesterdayBadge = isYesterday(pubDate);
 
   return (
-    <Link href={`/articles/${article.id}`} className="group block">
-      <article className="flex gap-3 p-3 rounded-xl glass hover:glow-hover transition-all duration-200">
+    <>
+      <article className="group flex gap-3 p-3 rounded-xl glass hover:glow-hover transition-all duration-200">
         {/* Left: Cover image (square) */}
         <div className="relative w-[88px] h-[88px] flex-shrink-0 rounded-lg overflow-hidden bg-zinc-900">
           {article.coverImage && !imgError ? (
@@ -93,9 +95,11 @@ export function ArticleCard({ article }: ArticleCardProps) {
           </div>
 
           {/* Title — primary focus */}
-          <h3 className="text-[13px] sm:text-sm font-semibold text-white leading-snug line-clamp-2 group-hover:text-violet-300 transition-colors pr-1">
-            {article.title}
-          </h3>
+          <Link href={`/articles/${article.id}`} className="block">
+            <h3 className="text-[13px] sm:text-sm font-semibold text-white leading-snug line-clamp-2 group-hover:text-violet-300 transition-colors pr-1">
+              {article.title}
+            </h3>
+          </Link>
 
           {/* TLDR — only show if it's actually meaningful */}
           {article.subtitle && article.subtitle.length > 10 && (
@@ -104,15 +108,36 @@ export function ArticleCard({ article }: ArticleCardProps) {
             </p>
           )}
 
-          {/* Meta row */}
-          <div className="flex items-center gap-x-1.5 text-[10px] text-zinc-600">
-            <span>{timeAgo}</span>
-            <span>·</span>
-            <Clock className="w-2.5 h-2.5 flex-shrink-0" />
-            <span>{article.readTime}m</span>
+          {/* Meta row + save button */}
+          <div className="flex items-center justify-between">
+            <div className="flex items-center gap-x-1.5 text-[10px] text-zinc-600">
+              <span>{timeAgo}</span>
+              <span>·</span>
+              <Clock className="w-2.5 h-2.5 flex-shrink-0" />
+              <span>{article.readTime}m</span>
+            </div>
+            <button
+              onClick={(e) => { e.preventDefault(); setShowModal(true); }}
+              className="p-1.5 rounded-lg text-zinc-600 hover:text-violet-400 hover:bg-violet-500/10 transition-all"
+              title="Save to list"
+            >
+              <Bookmark className="w-3.5 h-3.5" />
+            </button>
           </div>
         </div>
       </article>
-    </Link>
+
+      <SaveToListModal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        item={{
+          title: article.title,
+          description: article.subtitle || undefined,
+          url: `/articles/${article.id}`,
+          image: article.coverImage || undefined,
+          tags: article.tags,
+        }}
+      />
+    </>
   );
 }

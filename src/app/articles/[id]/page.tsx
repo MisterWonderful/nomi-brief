@@ -28,6 +28,21 @@ const sanitizeSchema = {
   },
 };
 
+// Simple regex-based HTML sanitizer (no jsdom/DOMPurify needed for server-side use)
+// Strips <script>, event handlers, and javascript: URLs, but allows safe tags
+function sanitizeArticleHtml(html: string): string {
+  // Auto-convert YouTube URLs to embeds
+  const withEmbeds = html.replace(
+    /(?:https?:\/\/)?(?:www\.)?(?:youtube\.com\/watch\?v=|youtu\.be\/)([a-zA-Z0-9_-]{11})/g,
+    '<div style="position:relative;padding-bottom:56.25%;height:0;overflow:hidden;margin:1rem 0;border-radius:0.75rem;"><iframe src="https://www.youtube.com/embed/$1" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen loading="lazy" style="position:absolute;top:0;left:0;width:100%;height:100%;"></iframe></div>'
+  );
+  // Strip script tags, event handlers, javascript: URLs
+  return withEmbeds
+    .replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, "")
+    .replace(/\s+on\w+\s*=\s*["'][^"']*["']/gi, "")
+    .replace(/javascript:/gi, "");
+}
+
 interface ArticlePageProps {
   params: Promise<{ id: string }>;
 }
@@ -151,6 +166,14 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
             {preprocessYouTubeUrls(article.content)}
           </ReactMarkdown>
         </article>
+
+        {/* Rich HTML content from agents (YouTube embeds, custom layouts, etc.) */}
+        {article.contentHtml && (
+          <div
+            className="mt-6 p-4 sm:p-6 rounded-xl bg-zinc-900/50 border border-zinc-800/50"
+            dangerouslySetInnerHTML={{ __html: sanitizeArticleHtml(article.contentHtml) }}
+          />
+        )}
 
         {/* Source link */}
         <SourceLink sourceUrl={article.sourceUrl as string | undefined} source={article.source as string | undefined} />

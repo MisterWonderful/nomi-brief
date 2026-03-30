@@ -3,6 +3,7 @@
 import { useEffect, useState, useRef, useCallback } from "react";
 import { ArticleCard } from "./ArticleCard";
 import { Loader2 } from "lucide-react";
+import { isToday, isYesterday, format } from "date-fns";
 
 interface Article {
   id: string;
@@ -25,6 +26,32 @@ interface ArticlesResponse {
   page: number;
   pageSize: number;
   totalPages: number;
+}
+
+function DateSeparator({ date }: { date: Date }) {
+  const isTodayDate = isToday(date);
+  const isYesterdayDate = isYesterday(date);
+
+  let label: string;
+  if (isTodayDate) {
+    label = "Today";
+  } else if (isYesterdayDate) {
+    label = "Yesterday";
+  } else {
+    label = format(date, "EEEE, MMMM d");
+  }
+
+  return (
+    <div className="flex items-center gap-3 py-2">
+      <div className="flex-1 h-px bg-zinc-800/60" />
+      <span className={`text-[10px] font-semibold uppercase tracking-widest px-2 ${
+        isTodayDate ? "text-emerald-400/80" : "text-zinc-600"
+      }`}>
+        {label}
+      </span>
+      <div className="flex-1 h-px bg-zinc-800/60" />
+    </div>
+  );
 }
 
 export function ArticleFeed() {
@@ -51,7 +78,6 @@ export function ArticleFeed() {
       const json: ArticlesResponse = await res.json();
 
       setArticles((prev) => {
-        // Deduplicate by id
         const existing = new Set(prev.map((a) => a.id));
         const newArticles = json.data.filter((a) => !existing.has(a.id));
         return [...prev, ...newArticles];
@@ -96,48 +122,74 @@ export function ArticleFeed() {
     };
   }, [hasMore, loading, page, fetchArticles]);
 
+  // Group articles by date for date separators
+  function groupArticlesByDate(arts: Article[]): Array<{ date: Date; articles: Article[] }> {
+    const groups: Map<string, { date: Date; articles: Article[] }> = new Map();
+
+    for (const article of arts) {
+      const date = new Date(article.publishedAt);
+      const dateKey = date.toISOString().slice(0, 10); // YYYY-MM-DD
+
+      if (!groups.has(dateKey)) {
+        groups.set(dateKey, { date, articles: [] });
+      }
+      groups.get(dateKey)!.articles.push(article);
+    }
+
+    return Array.from(groups.values()).sort(
+      (a, b) => b.date.getTime() - a.date.getTime()
+    );
+  }
+
   if (!initialLoaded) {
     return (
-      <div className="flex items-center justify-center py-16">
-        <Loader2 className="w-6 h-6 text-violet-400 animate-spin" />
-        <span className="ml-3 text-sm text-zinc-400">Loading articles…</span>
+      <div className="flex items-center justify-center py-12">
+        <Loader2 className="w-5 h-5 text-violet-500 animate-spin" />
+        <span className="ml-2.5 text-sm text-zinc-500">Loading…</span>
       </div>
     );
   }
 
   if (articles.length === 0) {
     return (
-      <div className="glass rounded-2xl p-12 text-center">
-        <p className="text-zinc-400 text-lg">No articles yet</p>
-        <p className="text-zinc-600 text-sm mt-2">
-          Configure the OpenClaw webhook to receive AI-generated articles
+      <div className="rounded-2xl p-10 text-center border border-zinc-800/50">
+        <p className="text-zinc-400 text-sm">No articles yet</p>
+        <p className="text-zinc-600 text-xs mt-1.5">
+          AI-curated briefs arrive daily via webhook
         </p>
       </div>
     );
   }
 
+  const groups = groupArticlesByDate(articles);
+
   return (
-    <div className="flex flex-col gap-3 sm:gap-4">
-      {articles.map((article) => (
-        <ArticleCard key={article.id} article={article} />
+    <div className="flex flex-col gap-1">
+      {groups.map((group) => (
+        <div key={group.date.toISOString().slice(0, 10)}>
+          <DateSeparator date={group.date} />
+          <div className="flex flex-col gap-2">
+            {group.articles.map((article) => (
+              <ArticleCard key={article.id} article={article} />
+            ))}
+          </div>
+        </div>
       ))}
 
-      {/* Sentinel element for infinite scroll */}
+      {/* Sentinel */}
       {hasMore && (
-        <div ref={sentinelRef} className="flex items-center justify-center py-8">
+        <div ref={sentinelRef} className="flex items-center justify-center py-6">
           {loading && (
-            <>
-              <Loader2 className="w-5 h-5 text-violet-400 animate-spin" />
-              <span className="ml-2 text-xs text-zinc-500">Loading more…</span>
-            </>
+            <Loader2 className="w-4 h-4 text-zinc-600 animate-spin" />
           )}
         </div>
       )}
 
-      {/* End of feed */}
       {!hasMore && articles.length > 0 && (
-        <div className="text-center py-8">
-          <p className="text-xs text-zinc-600">You&apos;ve reached the end</p>
+        <div className="text-center pt-8 pb-2">
+          <p className="text-[11px] text-zinc-700">
+            {articles.length} articles · Nomi Brief
+          </p>
         </div>
       )}
     </div>

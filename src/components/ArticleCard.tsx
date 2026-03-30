@@ -3,7 +3,8 @@
 import Link from "next/link";
 import Image from "next/image";
 import { Clock } from "lucide-react";
-import { formatDistanceToNow } from "date-fns";
+import { formatDistanceToNow, isToday, isYesterday } from "date-fns";
+import { useState } from "react";
 
 interface Article {
   id: string;
@@ -24,64 +25,91 @@ interface ArticleCardProps {
   article: Article;
 }
 
+const CATEGORY_GRADIENTS: Record<string, string> = {
+  "Industry":       "from-amber-900/70 to-orange-900/50",
+  "Technical":      "from-violet-900/70 to-purple-900/50",
+  "Safety & Policy": "from-emerald-900/70 to-teal-900/50",
+  "Academic":       "from-blue-900/70 to-cyan-900/50",
+  "AI & Technology":"from-violet-900/70 to-fuchsia-900/50",
+  "Development":    "from-green-900/70 to-emerald-900/50",
+  "Infrastructure":"from-slate-800/80 to-zinc-800/60",
+  "General":        "from-zinc-800/60 to-neutral-800/40",
+};
+
+function CategoryGradient({ category }: { category: string }) {
+  const grad = CATEGORY_GRADIENTS[category] ?? "from-violet-900/70 to-purple-900/50";
+  return (
+    <div className={`w-full h-full bg-gradient-to-br ${grad} flex items-center justify-center p-2`}>
+      <span className="text-[9px] font-semibold text-white/50 uppercase tracking-widest text-center leading-tight">
+        {category}
+      </span>
+    </div>
+  );
+}
+
 export function ArticleCard({ article }: ArticleCardProps) {
-  const timeAgo = formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true });
+  const [imgError, setImgError] = useState(false);
+  const pubDate = new Date(article.publishedAt);
+  const timeAgo = formatDistanceToNow(pubDate, { addSuffix: true });
+  const showTodayBadge = isToday(pubDate);
+  const showYesterdayBadge = isYesterday(pubDate);
 
   return (
     <Link href={`/articles/${article.id}`} className="group block">
-      <article className="flex gap-4 p-3 sm:p-4 rounded-xl sm:rounded-2xl glass hover:glow-hover transition-all duration-200">
-        {/* Left: Cover image or gradient fallback */}
-        <div className="relative w-[100px] h-[100px] sm:w-[120px] sm:h-[120px] flex-shrink-0 rounded-lg sm:rounded-xl overflow-hidden">
-          {article.coverImage ? (
+      <article className="flex gap-3 p-3 rounded-xl glass hover:glow-hover transition-all duration-200">
+        {/* Left: Cover image (square) */}
+        <div className="relative w-[88px] h-[88px] flex-shrink-0 rounded-lg overflow-hidden bg-zinc-900">
+          {article.coverImage && !imgError ? (
             <Image
               src={article.coverImage}
               alt={article.title}
               fill
               className="object-cover transition-transform duration-300 group-hover:scale-[1.06]"
-              sizes="120px"
+              sizes="88px"
+              onError={() => setImgError(true)}
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-violet-900/60 to-purple-900/40 flex items-center justify-center">
-              <span className="text-[10px] text-violet-400/60 font-medium px-2 text-center leading-tight">
-                {article.category}
-              </span>
-            </div>
+            <CategoryGradient category={article.category} />
           )}
         </div>
 
         {/* Right: Content */}
-        <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5">
-          <div>
-            {/* Category badge */}
-            <span className="inline-block px-2 py-0.5 text-[10px] font-semibold bg-violet-500/15 text-violet-400 rounded-full mb-1.5">
+        <div className="flex-1 min-w-0 flex flex-col justify-between py-0.5 gap-1.5">
+          {/* Top row: category + badges */}
+          <div className="flex items-center gap-1.5">
+            <span className="text-[10px] font-medium text-zinc-500 uppercase tracking-wide">
               {article.category}
             </span>
-
-            {/* Title */}
-            <h3 className="text-sm sm:text-base font-bold text-white leading-snug line-clamp-2 group-hover:text-violet-300 transition-colors">
-              {article.title}
-            </h3>
-
-            {/* TLDR / Subtitle */}
-            {article.subtitle && (
-              <p className="mt-1 text-xs sm:text-sm text-zinc-400 line-clamp-2 leading-relaxed">
-                {article.subtitle}
-              </p>
+            {showTodayBadge && (
+              <span className="px-1.5 py-0.5 text-[9px] font-semibold bg-emerald-500/20 text-emerald-400 rounded-full">
+                New
+              </span>
+            )}
+            {showYesterdayBadge && (
+              <span className="px-1.5 py-0.5 text-[9px] font-medium text-amber-400/70 bg-amber-500/10 rounded-full">
+                Yesterday
+              </span>
             )}
           </div>
 
+          {/* Title — primary focus */}
+          <h3 className="text-[13px] sm:text-sm font-semibold text-white leading-snug line-clamp-2 group-hover:text-violet-300 transition-colors pr-1">
+            {article.title}
+          </h3>
+
+          {/* TLDR — only show if it's actually meaningful */}
+          {article.subtitle && article.subtitle.length > 10 && (
+            <p className="text-[11px] sm:text-xs text-zinc-500 line-clamp-1 leading-relaxed">
+              {article.subtitle}
+            </p>
+          )}
+
           {/* Meta row */}
-          <div className="flex items-center gap-x-2 text-[10px] sm:text-xs text-zinc-500 mt-2">
-            <span className="text-zinc-400 font-medium truncate max-w-[100px] sm:max-w-[140px]">
-              {article.authorName}
-            </span>
-            <span>·</span>
+          <div className="flex items-center gap-x-1.5 text-[10px] text-zinc-600">
             <span>{timeAgo}</span>
             <span>·</span>
-            <span className="flex items-center gap-1">
-              <Clock className="w-3 h-3 flex-shrink-0" />
-              {article.readTime}m
-            </span>
+            <Clock className="w-2.5 h-2.5 flex-shrink-0" />
+            <span>{article.readTime}m</span>
           </div>
         </div>
       </article>

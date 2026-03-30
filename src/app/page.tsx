@@ -1,9 +1,7 @@
 import { ArticleFeed } from "@/components/ArticleFeed";
-import { Button } from "@/components/ui/Button";
-import { Sparkles } from "lucide-react";
 import { prisma } from "@/lib/prisma";
+import { Newspaper } from "lucide-react";
 
-// Force dynamic rendering to avoid stale data
 export const dynamic = "force-dynamic";
 
 async function getDefaultUser() {
@@ -14,124 +12,56 @@ async function getDefaultUser() {
 async function getHomeStats() {
   try {
     const user = await getDefaultUser();
-    if (!user) return { stats: null, userName: "Ryan" };
+    if (!user) return { todayCount: 0, totalCount: 0 };
 
     const now = new Date();
-    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const startOfDay = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
 
-    const [articleCount, linkCount, todayArticles, totalReadingMinutes, categories] =
-      await Promise.all([
-        prisma.article.count({ where: { userId: user.id, isPublished: true } }),
-        prisma.linkEntry.count({ where: { userId: user.id } }),
-        prisma.article.count({
-          where: { userId: user.id, isPublished: true, publishedAt: { gte: startOfDay } },
-        }),
-        prisma.article.aggregate({
-          where: { userId: user.id, isPublished: true, publishedAt: { gte: startOfDay } },
-          _sum: { readTime: true },
-        }),
-        prisma.article.findMany({
-          where: { userId: user.id, isPublished: true },
-          select: { category: true },
-          distinct: ["category"],
-        }),
-      ]);
+    const [todayCount, totalCount] = await Promise.all([
+      prisma.article.count({
+        where: { userId: user.id, isPublished: true, publishedAt: { gte: startOfDay } },
+      }),
+      prisma.article.count({ where: { userId: user.id, isPublished: true } }),
+    ]);
 
-    const stats = {
-      articleCount,
-      linkCount,
-      todayArticles,
-      totalReadingMinutes: totalReadingMinutes._sum.readTime || 0,
-      topicCount: categories.length || 1,
-    };
-
-    return { stats, userName: user.name || "Ryan" };
-  } catch (error) {
-    console.error("Error fetching home stats:", error);
-    return { stats: null, userName: "Ryan" };
+    return { todayCount, totalCount };
+  } catch {
+    return { todayCount: 0, totalCount: 0 };
   }
 }
 
 export default async function HomePage() {
-  const { stats, userName } = await getHomeStats();
+  const { todayCount, totalCount } = await getHomeStats();
 
-  // Determine greeting based on time of day
   const hour = new Date().getHours();
-  const greeting = hour < 12 ? "Good Morning" : hour < 18 ? "Good Afternoon" : "Good Evening";
+  const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="space-y-8">
-      {/* Header */}
-      <div className="space-y-4">
-        <div>
-          <h1 className="text-2xl sm:text-3xl md:text-4xl font-bold text-white font-display leading-tight">
-            {greeting},{" "}
-            <span className="bg-gradient-to-r from-violet-400 to-purple-400 bg-clip-text text-transparent">
-              {userName}
-            </span>
-          </h1>
-          <p className="mt-1.5 text-sm text-zinc-400 md:text-base">
-            Your AI-curated news and insights are ready
-          </p>
+    <div className="space-y-6">
+      {/* Header bar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-violet-500/20 border border-violet-500/30 flex items-center justify-center">
+            <Newspaper className="w-4 h-4 text-violet-400" />
+          </div>
+          <div>
+            <h1 className="text-base font-semibold text-white leading-none">{greeting}, Ryan</h1>
+            <p className="text-[11px] text-zinc-500 mt-0.5 leading-none">
+              {todayCount > 0
+                ? `${todayCount} new article${todayCount !== 1 ? "s" : ""} today`
+                : "No new articles today"}
+            </p>
+          </div>
         </div>
-        <div className="flex justify-start">
-          <Button
-            variant="primary"
-            size="sm"
-            className="text-xs sm:text-sm"
-            disabled
-            title="Feature coming soon"
-          >
-            <Sparkles className="w-3.5 h-3.5 sm:w-4 sm:h-4 mr-2" />
-            Generate Brief
-          </Button>
+
+        {/* Minimal stats pill */}
+        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-zinc-900/60 border border-zinc-800/60">
+          <span className="text-[11px] text-zinc-500">Total</span>
+          <span className="text-[11px] font-semibold text-zinc-300">{totalCount}</span>
         </div>
       </div>
 
-      {/* Stats — 2 cols on mobile, 4 on desktop */}
-      {stats && (
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-2.5 sm:gap-3 md:gap-4">
-          <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
-            <p className="text-[10px] sm:text-xs text-zinc-500">Articles</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5">
-              {stats.articleCount}
-            </p>
-            <p className="text-[10px] sm:text-xs text-violet-400 mt-0.5">
-              {stats.todayArticles > 0 ? `+${stats.todayArticles} today` : "No new today"}
-            </p>
-          </div>
-          <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
-            <p className="text-[10px] sm:text-xs text-zinc-500">Links</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5">
-              {stats.linkCount}
-            </p>
-            <p className="text-[10px] sm:text-xs text-zinc-600 mt-0.5">Saved</p>
-          </div>
-          <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
-            <p className="text-[10px] sm:text-xs text-zinc-500">Reading</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5">
-              {stats.totalReadingMinutes > 0
-                ? stats.totalReadingMinutes >= 60
-                  ? `${(stats.totalReadingMinutes / 60).toFixed(1)}h`
-                  : `${stats.totalReadingMinutes}m`
-                : "0m"}
-            </p>
-            <p className="text-[10px] sm:text-xs text-zinc-600 mt-0.5">Today</p>
-          </div>
-          <div className="glass rounded-xl sm:rounded-2xl p-3 sm:p-5 md:p-6">
-            <p className="text-[10px] sm:text-xs text-zinc-500">Topics</p>
-            <p className="text-xl sm:text-2xl md:text-3xl font-bold text-white mt-0.5">
-              {stats.topicCount}
-            </p>
-            <p className="text-[10px] sm:text-xs text-zinc-600 mt-0.5">Active</p>
-          </div>
-        </div>
-      )}
-
-      {/* Divider */}
-      <div className="h-px bg-zinc-800/60" />
-
-      {/* Article Feed with infinite scroll */}
+      {/* Article Feed */}
       <ArticleFeed />
     </div>
   );

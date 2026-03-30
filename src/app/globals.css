@@ -195,8 +195,8 @@
     @apply text-zinc-300;
   }
   .article-content p { @apply mb-6 text-zinc-300; line-height: 1.85; font-size: 1.0625rem; }
-  .article-content h1 { @apply text-3xl font-bold text-white mt-10 mb-5 font-display; }
-  .article-content h2 { @apply text-2xl font-bold text-white mt-10 mb-4 font-display; border-b border-zinc-800 pb-2; }
+  .article-content h1 { @apply text-3xl font-bold text-white mt-10 mb-5; font-family: var(--font-playfair), Georgia, serif; }
+  .article-content h2 { @apply text-2xl font-bold text-white mt-10 mb-4; font-family: var(--font-playfair), Georgia, serif; border-bottom: 1px solid #27272a; padding-bottom: 0.5rem; }
   .article-content h3 { @apply text-lg font-semibold text-white/90 mt-6 mb-3; }
   .article-content a { @apply text-violet-400 hover:text-violet-300 underline underline-offset-2 decoration-violet-400/50; font-weight: 500; }
   .article-content ul { @apply mb-6 pl-6 space-y-2; }

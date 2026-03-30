@@ -2,8 +2,10 @@
 
 import Link from "next/link";
 import Image from "next/image";
-import { Clock, Star } from "lucide-react";
+import { useRouter } from "next/navigation";
+import { Clock, Star, Trash2 } from "lucide-react";
 import { formatDistanceToNow } from "date-fns";
+import { useState } from "react";
 
 interface Article {
   id: string;
@@ -26,7 +28,34 @@ interface ArticleCardProps {
 }
 
 export function ArticleCard({ article, featured = false }: ArticleCardProps) {
+  const router = useRouter();
   const timeAgo = formatDistanceToNow(new Date(article.publishedAt), { addSuffix: true });
+  const [deleting, setDeleting] = useState(false);
+
+  async function handleDelete(e: React.MouseEvent) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (!confirm(`Delete "${article.title.slice(0, 40)}..."?`)) return;
+    setDeleting(true);
+    try {
+      const res = await fetch("/api/articles/delete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ id: article.id }),
+      });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        alert("Failed to delete article");
+        setDeleting(false);
+      }
+    } catch {
+      alert("Failed to delete article");
+      setDeleting(false);
+    }
+  }
+
+  if (deleting) return null;
 
   if (featured) {
     return (
@@ -185,6 +214,16 @@ export function ArticleCard({ article, featured = false }: ArticleCardProps) {
                 <Star className="w-3 h-3 text-yellow-400 fill-yellow-400 flex-shrink-0" />
               </>
             )}
+            {/* Delete button */}
+            <span className="ml-auto">
+              <button
+                onClick={handleDelete}
+                className="p-1 rounded-md text-zinc-600 hover:text-red-400 hover:bg-red-500/10 transition-colors"
+                title="Delete article"
+              >
+                <Trash2 className="w-3.5 h-3.5" />
+              </button>
+            </span>
           </div>
         </div>
       </article>

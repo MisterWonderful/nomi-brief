@@ -35,8 +35,9 @@ async function getSavedArticles(searchParams: SearchParams) {
   }
 }
 
-export default async function SavedPage({ searchParams }: { searchParams: SearchParams }) {
-  const { articles, total, page, pageSize } = await getSavedArticles(searchParams);
+export default async function SavedPage({ searchParams }: { searchParams: Promise<SearchParams> }) {
+  const resolved = await searchParams;
+  const { articles, total, page, pageSize } = await getSavedArticles(resolved);
 
   return (
     <div className="min-h-screen bg-zinc-950">

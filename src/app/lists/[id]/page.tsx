@@ -22,7 +22,7 @@ export default async function ListDetailPage({
   if (!list) notFound();
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4">
       {/* Back */}
       <Link
         href="/lists"

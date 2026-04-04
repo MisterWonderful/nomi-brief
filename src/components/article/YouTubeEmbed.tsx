@@ -27,7 +27,7 @@ export function YouTubeEmbed({ url, title = "Video" }: YouTubeEmbedProps) {
         href={url}
         target="_blank"
         rel="noopener noreferrer"
-        className="flex items-center gap-3 p-4 rounded-xl bg-zinc-900/60 border border-zinc-800 hover:border-zinc-700 transition-colors group"
+        className="flex items-center gap-3 p-4 rounded-xl bg-[#111111]/60 border border-zinc-800 hover:border-zinc-700 transition-colors group"
       >
         <div className="w-10 h-10 rounded-full bg-red-500/20 flex items-center justify-center flex-shrink-0">
           <svg className="w-5 h-5 text-red-400" viewBox="0 0 24 24" fill="currentColor">
@@ -35,7 +35,7 @@ export function YouTubeEmbed({ url, title = "Video" }: YouTubeEmbedProps) {
           </svg>
         </div>
         <div>
-          <p className="text-white text-sm font-medium group-hover:text-violet-400 transition-colors">Watch on YouTube</p>
+          <p className="text-white text-sm font-medium group-hover:text-[#4ade80] transition-colors">Watch on YouTube</p>
           <p className="text-zinc-500 text-xs mt-0.5">{title}</p>
         </div>
       </a>
@@ -46,7 +46,7 @@ export function YouTubeEmbed({ url, title = "Video" }: YouTubeEmbedProps) {
   const embedUrl = `https://www.youtube.com/embed/${videoId}?rel=0&modestbranding=1`;
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden border border-zinc-800/50 bg-zinc-900">
+    <div className="relative w-full rounded-xl overflow-hidden border border-[#1c1c1c] bg-[#111111]">
       {/* Thumbnail with play button overlay */}
       <div className="relative aspect-video">
         <img
@@ -63,7 +63,7 @@ export function YouTubeEmbed({ url, title = "Video" }: YouTubeEmbedProps) {
           className="absolute inset-0 flex items-center justify-center group"
           aria-label={`Play: ${title}`}
         >
-          <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border border-white/20 group-hover:scale-110 transition-transform">
+          <div className="w-16 h-16 rounded-full bg-black/60 backdrop-blur-sm flex items-center justify-center border border-white/20  transition-transform">
             <svg className="w-7 h-7 text-white ml-1" viewBox="0 0 24 24" fill="currentColor">
               <path d="M8 5v14l11-7z"/>
             </svg>
@@ -71,7 +71,7 @@ export function YouTubeEmbed({ url, title = "Video" }: YouTubeEmbedProps) {
         </a>
       </div>
       {/* Caption */}
-      <div className="p-3 bg-zinc-900/80 border-t border-zinc-800/50">
+      <div className="p-3 bg-[#111111]/80 border-t border-[#1c1c1c]">
         <p className="text-zinc-400 text-xs">{title}</p>
       </div>
     </div>

@@ -99,7 +99,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
 
         {/* Cover Image */}
         {article.coverImage && (
-          <div className="relative aspect-[16/9] sm:aspect-[2.4/1] rounded-xl sm:rounded-2xl overflow-hidden">
+          <div className="relative aspect-[16/9] sm:aspect-[2.4/1] rounded-xl overflow-hidden">
             <Image
               src={article.coverImage}
               alt={article.title}
@@ -113,7 +113,7 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
         {/* Header */}
         <div className="space-y-3 sm:space-y-4">
           {/* Title */}
-          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#e5e5e5] font-display leading-tight">
+          <h1 className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold text-[#e5e5e5] leading-tight">
             {article.title}
           </h1>
 

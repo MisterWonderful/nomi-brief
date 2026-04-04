@@ -42,7 +42,7 @@ export function ArticleCard({ article }: ArticleCardProps) {
               src={article.coverImage}
               alt={article.title}
               fill
-              className="object-cover transition-transform duration-300 group-hover:scale-[1.04]"
+              className="object-cover transition-transform duration-300 "
               sizes="72px"
               onError={() => setImgError(true)}
             />

@@ -26,7 +26,7 @@ interface SaveToListModalProps {
 }
 
 const COLOR_MAP: Record<string, string> = {
-  violet: "text-violet-400",
+  violet: "text-[#525252]",
   blue: "text-blue-400",
   green: "text-green-400",
   amber: "text-amber-400",
@@ -120,20 +120,20 @@ export function SaveToListModal({ isOpen, onClose, item }: SaveToListModalProps)
       />
 
       {/* Modal */}
-      <div className="relative w-full sm:max-w-md bg-zinc-900 border border-zinc-800 rounded-t-2xl sm:rounded-2xl p-5 max-h-[80vh] overflow-y-auto animate-slide-up">
+      <div className="relative w-full sm:max-w-md bg-[#111111] border border-[#1c1c1c] rounded-t-2xl sm:rounded-xl p-5 max-h-[80vh] overflow-y-auto animate-slide-up">
         {/* Header */}
         <div className="flex items-center justify-between mb-4">
           <h2 className="text-lg font-semibold text-white">Save to List</h2>
           <button
             onClick={onClose}
-            className="p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-zinc-800 transition-all"
+            className="p-1.5 rounded-lg text-zinc-500 hover:text-white hover:bg-[#111111] transition-all"
           >
             <X className="w-5 h-5" />
           </button>
         </div>
 
         {/* Item preview */}
-        <div className="mb-4 p-3 rounded-lg bg-zinc-800/50 border border-zinc-700/30">
+        <div className="mb-4 p-3 rounded-lg bg-[#111111]/50 border border-[#1c1c1c]/30">
           <p className="text-sm text-white font-medium line-clamp-1">{item.title}</p>
           {item.description && (
             <p className="text-xs text-zinc-500 line-clamp-1 mt-0.5">{item.description}</p>
@@ -152,9 +152,9 @@ export function SaveToListModal({ isOpen, onClose, item }: SaveToListModalProps)
                 key={list.id}
                 onClick={() => handleSaveToList(list.id)}
                 disabled={saving === list.id}
-                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-zinc-800/60 transition-all disabled:opacity-50 text-left"
+                className="w-full flex items-center gap-3 px-3 py-3 rounded-xl hover:bg-[#111111]/60 transition-all disabled:opacity-50 text-left"
               >
-                <div className={`w-8 h-8 rounded-lg bg-zinc-800 flex items-center justify-center ${COLOR_MAP[list.color] || "text-violet-400"}`}>
+                <div className={`w-8 h-8 rounded-lg bg-[#111111] flex items-center justify-center ${COLOR_MAP[list.color] || "text-[#525252]"}`}>
                   <Bookmark className="w-4 h-4" />
                 </div>
                 <div className="flex-1 min-w-0">
@@ -166,7 +166,7 @@ export function SaveToListModal({ isOpen, onClose, item }: SaveToListModalProps)
                 {saved === list.id ? (
                   <Check className="w-5 h-5 text-green-400" />
                 ) : saving === list.id ? (
-                  <div className="w-5 h-5 border-2 border-violet-500 border-t-transparent rounded-full animate-spin" />
+                  <div className="w-5 h-5 border-2 border-[#4ade80] border-t-transparent rounded-full animate-spin" />
                 ) : null}
               </button>
             ))
@@ -181,14 +181,14 @@ export function SaveToListModal({ isOpen, onClose, item }: SaveToListModalProps)
               value={newListName}
               onChange={(e) => setNewListName(e.target.value)}
               placeholder="List name"
-              className="flex-1 px-3 py-2 rounded-lg bg-zinc-800 border border-zinc-700 text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-violet-500"
+              className="flex-1 px-3 py-2 rounded-lg bg-[#111111] border border-[#1c1c1c] text-white text-sm placeholder:text-zinc-600 focus:outline-none focus:border-[#4ade80]"
               autoFocus
               onKeyDown={(e) => e.key === "Enter" && handleCreateAndSave()}
             />
             <button
               onClick={handleCreateAndSave}
               disabled={saving === "new" || !newListName.trim()}
-              className="px-3 py-2 rounded-lg bg-violet-500 text-white text-sm disabled:opacity-50"
+              className="px-3 py-2 rounded-lg bg-[#111111] text-[#4ade80] border border-[#1c1c1c] text-white text-sm disabled:opacity-50"
             >
               {saving === "new" ? "..." : "Create & Save"}
             </button>
@@ -196,7 +196,7 @@ export function SaveToListModal({ isOpen, onClose, item }: SaveToListModalProps)
         ) : (
           <button
             onClick={() => setShowCreate(true)}
-            className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-zinc-700 text-zinc-500 hover:text-violet-400 hover:border-violet-500/50 transition-all text-sm"
+            className="mt-3 w-full flex items-center justify-center gap-2 px-3 py-2.5 rounded-xl border border-dashed border-[#1c1c1c] text-zinc-500 hover:text-[#525252] hover:border-[#4ade80]/50 transition-all text-sm"
           >
             <Plus className="w-4 h-4" />
             Create new list

@@ -144,7 +144,7 @@ export function ArticleFeed() {
   if (!initialLoaded) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="w-5 h-5 text-violet-500 animate-spin" />
+        <Loader2 className="w-5 h-5 text-[#4ade80] animate-spin" />
         <span className="ml-2.5 text-sm text-zinc-500">Loading…</span>
       </div>
     );
@@ -152,7 +152,7 @@ export function ArticleFeed() {
 
   if (articles.length === 0) {
     return (
-      <div className="rounded-2xl p-10 text-center border border-zinc-800/50">
+      <div className="rounded-xl p-10 text-center border border-[#1c1c1c]">
         <p className="text-zinc-400 text-sm">No articles yet</p>
         <p className="text-zinc-600 text-xs mt-1.5">
           AI-curated briefs arrive daily via webhook

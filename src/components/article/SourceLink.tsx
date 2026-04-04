@@ -29,7 +29,7 @@ export function SourceLink({ sourceUrl, source }: SourceLinkProps) {
               href={sourceUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="inline-flex items-center gap-1.5 text-sm text-violet-400 hover:text-violet-300 transition-colors group"
+              className="inline-flex items-center gap-1.5 text-sm text-[#4ade80] hover:text-[#4ade80] transition-colors group"
             >
               <span className="font-medium truncate">{displaySource}</span>
               <ExternalLink className="w-3.5 h-3.5 opacity-60 group-hover:opacity-100 flex-shrink-0" />

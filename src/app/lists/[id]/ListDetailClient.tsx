@@ -93,7 +93,7 @@ export function ListDetailClient({ list }: { list: ListData }) {
               type="text"
               value={name}
               onChange={(e) => setName(e.target.value)}
-              className="w-full text-2xl font-bold bg-transparent border-b border-violet-500 text-white focus:outline-none font-display"
+              className="w-full text-2xl font-bold bg-transparent border-b border-[#4ade80] text-white focus:outline-none "
               autoFocus
             />
             <input
@@ -104,7 +104,7 @@ export function ListDetailClient({ list }: { list: ListData }) {
               className="w-full text-sm bg-transparent border-b border-zinc-700 text-zinc-400 focus:outline-none placeholder:text-zinc-600"
             />
             <div className="flex gap-2">
-              <button onClick={handleSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-violet-500/20 text-violet-400 text-sm hover:bg-violet-500/30">
+              <button onClick={handleSave} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#111111] text-[#4ade80] text-sm hover:border-[#2c2c2c]">
                 <Check className="w-4 h-4" /> Save
               </button>
               <button onClick={() => { setEditing(false); setName(list.name); setDescription(list.description || ""); }} className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-zinc-800 text-zinc-400 text-sm hover:bg-zinc-700">
@@ -115,7 +115,7 @@ export function ListDetailClient({ list }: { list: ListData }) {
         ) : (
           <div className="flex items-start justify-between gap-4">
             <div>
-              <h1 className="text-2xl font-bold text-white font-display">{list.name}</h1>
+              <h1 className="text-2xl font-bold text-white ">{list.name}</h1>
               {list.description && (
                 <p className="text-sm text-zinc-500 mt-1">{list.description}</p>
               )}
@@ -157,7 +157,7 @@ export function ListDetailClient({ list }: { list: ListData }) {
           {list.items.map((item) => (
             <div
               key={item.id}
-              className="flex gap-4 p-4 rounded-xl glass hover:glow-hover transition-all"
+              className="flex gap-4 p-4 rounded-xl bg-[#111111] border border-[#1c1c1c] hover:border-[#2c2c2c] transition-all"
             >
               {/* Image */}
               {item.image && (
@@ -181,7 +181,7 @@ export function ListDetailClient({ list }: { list: ListData }) {
                       href={item.url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="text-sm font-semibold text-white hover:text-violet-300 transition-colors line-clamp-2"
+                      className="text-sm font-semibold text-white hover:text-[#4ade80] transition-colors line-clamp-2"
                     >
                       {item.title}
                     </a>

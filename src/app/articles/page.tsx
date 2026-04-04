@@ -98,12 +98,12 @@ export default async function ArticlesPage({
   return (
     <Suspense
       fallback={
-        <div className="space-y-6">
+        <div className="space-y-4">
           <div className="h-16 w-full max-w-xl bg-zinc-900/50 rounded-xl animate-pulse" />
           <div className="h-8 w-48 bg-zinc-900/50 rounded animate-pulse" />
-          <div className="grid gap-6">
+          <div className="grid gap-3">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="h-32 bg-zinc-900/50 rounded-2xl animate-pulse" />
+              <div key={i} className="h-32 bg-zinc-900/50 rounded-xl animate-pulse" />
             ))}
           </div>
         </div>

@@ -170,17 +170,17 @@ export function VoiceModal({ isOpen, onClose, articleId, articleTitle }: VoiceMo
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 0.95, opacity: 0 }}
             transition={{ type: "spring", damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-lg mx-4 bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden shadow-2xl"
+            className="relative w-full max-w-lg mx-4 bg-[#111111] rounded-xl border border-[#1c1c1c] overflow-hidden shadow-2xl"
           >
             {/* Header */}
-            <div className="flex items-center justify-between p-4 border-b border-zinc-800">
+            <div className="flex items-center justify-between p-4 border-b border-[#1c1c1c]">
               <div>
                 <h2 className="text-lg font-semibold text-white">Talk about this article</h2>
-                <p className="text-sm text-zinc-500 truncate max-w-xs">{articleTitle}</p>
+                <p className="text-sm text-[#525252] truncate max-w-xs">{articleTitle}</p>
               </div>
               <button
                 onClick={endCall}
-                className="p-2 rounded-lg hover:bg-zinc-800 text-zinc-400 hover:text-white transition-colors"
+                className="p-2 rounded-lg hover:bg-[#111111] text-zinc-400 hover:text-white transition-colors"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -190,13 +190,13 @@ export function VoiceModal({ isOpen, onClose, articleId, articleTitle }: VoiceMo
             <div className="p-4 space-y-4">
               {status === "idle" && (
                 <div className="text-center py-8">
-                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-violet-500/10 flex items-center justify-center">
-                    <Mic className="w-10 h-10 text-violet-400" />
+                  <div className="w-20 h-20 mx-auto mb-4 rounded-full bg-[#111111] flex items-center justify-center">
+                    <Mic className="w-10 h-10 text-[#4ade80]" />
                   </div>
                   <h3 className="text-lg font-medium text-white mb-2">
                     Ready to discuss this article?
                   </h3>
-                  <p className="text-sm text-zinc-500 mb-6">
+                  <p className="text-sm text-[#525252] mb-6">
                     Click below to start a voice conversation with Nomi about this article.
                   </p>
                   <Button variant="primary" size="lg" onClick={startConnection}>
@@ -208,11 +208,11 @@ export function VoiceModal({ isOpen, onClose, articleId, articleTitle }: VoiceMo
 
               {status === "connecting" && (
                 <div className="text-center py-8">
-                  <Loader2 className="w-12 h-12 mx-auto mb-4 text-violet-400 animate-spin" />
+                  <Loader2 className="w-12 h-12 mx-auto mb-4 text-[#4ade80] animate-spin" />
                   <h3 className="text-lg font-medium text-white mb-2">
                     Connecting to Nomi...
                   </h3>
-                  <p className="text-sm text-zinc-500">
+                  <p className="text-sm text-[#525252]">
                     Setting up voice connection
                   </p>
                 </div>
@@ -245,7 +245,7 @@ export function VoiceModal({ isOpen, onClose, articleId, articleTitle }: VoiceMo
                     {[...Array(20)].map((_, i) => (
                       <motion.div
                         key={i}
-                        className="w-1 bg-violet-500 rounded-full"
+                        className="w-1 text-[#4ade80] rounded-full"
                         animate={{
                           height: isListening 
                             ? `${Math.random() * 40 + 10}px`
@@ -263,7 +263,7 @@ export function VoiceModal({ isOpen, onClose, articleId, articleTitle }: VoiceMo
                   {/* Transcript */}
                   <div className="h-64 overflow-y-auto space-y-3 p-2">
                     {messages.length === 0 ? (
-                      <div className="text-center text-zinc-500 py-8">
+                      <div className="text-center text-[#525252] py-8">
                         <p>Start talking or type a message...</p>
                       </div>
                     ) : (
@@ -273,15 +273,15 @@ export function VoiceModal({ isOpen, onClose, articleId, articleTitle }: VoiceMo
                           className={`flex ${message.role === "user" ? "justify-end" : "justify-start"}`}
                         >
                           <div
-                            className={`max-w-[80%] rounded-2xl px-4 py-2 ${
+                            className={`max-w-[80%] rounded-xl px-4 py-2 ${
                               message.role === "user"
-                                ? "bg-violet-600 text-white"
-                                : "bg-zinc-800 text-zinc-200"
+                                ? "bg-[#111111] text-[#4ade80] border border-[#1c1c1c]"
+                                : "bg-[#111111] text-zinc-200"
                             }`}
                           >
                             <p className="text-sm">{message.content}</p>
                             <p className={`text-xs mt-1 ${
-                              message.role === "user" ? "text-violet-200" : "text-zinc-500"
+                              message.role === "user" ? "text-[#e5e5e5]" : "text-[#525252]"
                             }`}>
                               {message.timestamp.toLocaleTimeString()}
                             </p>
@@ -300,7 +300,7 @@ export function VoiceModal({ isOpen, onClose, articleId, articleTitle }: VoiceMo
                       onChange={(e) => setInputValue(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && sendTextMessage()}
                       placeholder="Type a message..."
-                      className="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-4 py-2 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                      className="flex-1 bg-[#111111] border border-[#1c1c1c] rounded-xl px-4 py-2 text-white placeholder-zinc-500 focus:outline-none focus:ring-2 focus:ring-[#4ade80]"
                     />
                     <Button variant="primary" onClick={sendTextMessage} disabled={!inputValue.trim()}>
                       <Send className="w-4 h-4" />

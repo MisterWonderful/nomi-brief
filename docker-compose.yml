@@ -1,40 +1,44 @@
-version: '3.8'
-
 services:
   app:
     build:
       context: .
       dockerfile: Dockerfile
+    container_name: nomi-brief
     ports:
-      - "3000:3000"
+      - "3050:3000"
     environment:
-      - DATABASE_URL=postgresql://nomi:nomibrief2026@postgres:5432/nomibrief?schema=public&connection_limit=10&pool_timeout=5
-      - DEFAULT_USER_EMAIL=nomi@nomibrief.app
-      - DEFAULT_USER_NAME=Ryan
-      - API_SECRET=nomi-brief-api-secret-2026
-      - WEBHOOK_SECRET=nomi-brief-webhook-secret-2026
-      - OPENCLAW_URL=http://host.docker.internal:18789
-      - JWT_SECRET=nomi-brief-secret-key-2026
-      - NEXT_PUBLIC_APP_URL=http://localhost:3000
-      - NEXT_PUBLIC_WS_URL=ws://localhost:3001
-      - VOICE_ENABLED=true
+      - DATABASE_URL=${DATABASE_URL}
+      - DEFAULT_USER_EMAIL=${DEFAULT_USER_EMAIL}
+      - DEFAULT_USER_NAME=${DEFAULT_USER_NAME}
+      - API_SECRET=${API_SECRET}
+      - WEBHOOK_SECRET=${WEBHOOK_SECRET}
+      - OPENCLAW_URL=${OPENCLAW_URL}
+      - JWT_SECRET=${JWT_SECRET}
+      - NEXT_PUBLIC_APP_URL=${NEXT_PUBLIC_APP_URL}
+      - VOICE_ENABLED=false
     depends_on:
-      - postgres
+      postgres:
+        condition: service_healthy
     restart: unless-stopped
     networks:
       - nomi-brief-network
+      - openclaw_default
 
   postgres:
     image: postgres:16-alpine
+    container_name: nomi-brief-db
     environment:
-      - POSTGRES_USER=nomi
-      - POSTGRES_PASSWORD=nomibrief2026
-      - POSTGRES_DB=nomibrief
+      - POSTGRES_USER=${POSTGRES_USER}
+      - POSTGRES_PASSWORD=${POSTGRES_PASSWORD}
+      - POSTGRES_DB=${POSTGRES_DB}
     volumes:
       - postgres_data:/var/lib/postgresql/data
-    ports:
-      - "5432:5432"
     restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 5s
+      timeout: 5s
+      retries: 5
     networks:
       - nomi-brief-network
 
@@ -44,3 +48,5 @@ volumes:
 networks:
   nomi-brief-network:
     driver: bridge
+  openclaw_default:
+    external: true

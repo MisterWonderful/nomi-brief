@@ -44,12 +44,11 @@ export function ArticlesClient({ articles, total, page, pageSize, hasMore }: Art
   };
 
   return (
-    <div className="space-y-6">
-      {/* Header */}
+    <div className="space-y-4">
       <div className="flex items-center justify-between gap-4">
         <div>
-          <h1 className="text-4xl font-bold text-white font-display">All Articles</h1>
-          <p className="mt-2 text-zinc-400">
+          <h1 className="text-xl font-semibold text-[#e5e5e5]">All Articles</h1>
+          <p className="mt-2 text-[#737373]">
             {total > 0
               ? `${total} article${total !== 1 ? "s" : ""}${searchParams.get("q") ? ` matching "${searchParams.get("q")}"` : ""}`
               : "No articles found"}
@@ -57,7 +56,6 @@ export function ArticlesClient({ articles, total, page, pageSize, hasMore }: Art
         </div>
       </div>
 
-      {/* Search + Controls */}
       <div className="space-y-4">
         <SearchInput placeholder="Search by title, content, or tags..." className="w-full max-w-xl" />
         <div className="flex items-center gap-4 flex-wrap">
@@ -67,42 +65,39 @@ export function ArticlesClient({ articles, total, page, pageSize, hasMore }: Art
         <ActiveFilters />
       </div>
 
-      {/* Pagination info */}
       {total > 0 && (
         <div className="flex items-center justify-between">
-          <p className="text-zinc-600 text-xs">
+          <p className="text-[#525252] text-xs">
             Showing {Math.min((page - 1) * pageSize + 1, total)}–{Math.min(page * pageSize, total)} of {total}
           </p>
         </div>
       )}
 
-      {/* Articles Grid */}
       {articles.length > 0 ? (
         <>
-          <div className="grid gap-6">
+          <div className="grid gap-3">
             {articles.map((article) => (
               <ArticleCard key={article.id} article={article} />
             ))}
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="flex items-center justify-center gap-2 pt-4">
               {page > 1 && (
                 <Link
                   href={buildPageUrl(page - 1)}
-                  className="px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-zinc-800 text-zinc-300 text-xs sm:text-sm hover:bg-zinc-700 active:scale-95 transition-all"
+                  className="px-3 py-2 rounded-lg bg-[#111111] border border-[#1c1c1c] text-[#737373] text-xs hover:border-[#2c2c2c] transition-colors"
                 >
                   ← Prev
                 </Link>
               )}
-              <span className="px-3 py-2 text-zinc-600 text-xs sm:text-sm">
+              <span className="px-3 py-2 text-[#525252] text-xs">
                 {page} / {totalPages}
               </span>
               {hasMore && (
                 <Link
                   href={buildPageUrl(page + 1)}
-                  className="px-3 py-2 sm:px-4 sm:py-2 rounded-xl bg-zinc-800 text-zinc-300 text-xs sm:text-sm hover:bg-zinc-700 active:scale-95 transition-all"
+                  className="px-3 py-2 rounded-lg bg-[#111111] border border-[#1c1c1c] text-[#737373] text-xs hover:border-[#2c2c2c] transition-colors"
                 >
                   Next →
                 </Link>
@@ -111,21 +106,21 @@ export function ArticlesClient({ articles, total, page, pageSize, hasMore }: Art
           )}
         </>
       ) : (
-        <div className="glass rounded-2xl p-12 text-center">
+        <div className="bg-[#111111] border border-[#1c1c1c] rounded-xl p-12 text-center">
           {searchParams.get("q") || searchParams.get("category") ? (
             <>
-              <p className="text-zinc-400 text-lg">No articles match your filters</p>
-              <p className="text-zinc-600 text-sm mt-2">
+              <p className="text-[#737373] text-lg">No articles match your filters</p>
+              <p className="text-[#525252] text-sm mt-2">
                 Try different search terms or{" "}
-                <Link href="/articles" className="text-violet-400 hover:underline">
+                <Link href="/articles" className="text-[#4ade80] hover:underline">
                   clear filters
                 </Link>
               </p>
             </>
           ) : (
             <>
-              <p className="text-zinc-400 text-lg">No articles yet</p>
-              <p className="text-zinc-600 text-sm mt-2">
+              <p className="text-[#737373] text-lg">No articles yet</p>
+              <p className="text-[#525252] text-sm mt-2">
                 Configure the OpenClaw webhook to receive AI-generated articles
               </p>
             </>

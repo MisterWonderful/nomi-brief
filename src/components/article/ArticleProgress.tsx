@@ -9,8 +9,7 @@ export function ArticleProgress() {
     const updateProgress = () => {
       const scrollTop = window.scrollY;
       const docHeight = document.documentElement.scrollHeight - window.innerHeight;
-      const scrollProgress = docHeight > 0 ? (scrollTop / docHeight) * 100 : 0;
-      setProgress(Math.min(100, Math.max(0, scrollProgress)));
+      setProgress(docHeight > 0 ? (scrollTop / docHeight) * 100 : 0);
     };
 
     window.addEventListener("scroll", updateProgress, { passive: true });
@@ -19,9 +18,9 @@ export function ArticleProgress() {
   }, []);
 
   return (
-    <div className="fixed bottom-[56px] left-0 right-0 z-40 h-0.5 bg-zinc-900">
+    <div className="fixed bottom-[56px] left-0 right-0 z-40 h-px bg-[#1c1c1c]">
       <div
-        className="h-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-100 ease-linear"
+        className="h-full bg-[#4ade80] transition-all duration-100 ease-linear"
         style={{ width: `${progress}%` }}
       />
     </div>

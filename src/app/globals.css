@@ -5,24 +5,24 @@
 @layer base {
   :root {
     --background: 0 0% 4%;
-    --foreground: 0 0% 98%;
-    --card: 0 0% 8%;
-    --card-foreground: 0 0% 98%;
-    --popover: 0 0% 8%;
-    --popover-foreground: 0 0% 98%;
-    --primary: 270 70% 60%;
-    --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 14%;
-    --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14%;
-    --muted-foreground: 0 0% 64%;
-    --accent: 0 0% 14%;
-    --accent-foreground: 0 0% 98%;
+    --foreground: 0 0% 90%;
+    --card: 0 0% 7%;
+    --card-foreground: 0 0% 90%;
+    --popover: 0 0% 7%;
+    --popover-foreground: 0 0% 90%;
+    --primary: 142 70% 56%;
+    --primary-foreground: 0 0% 4%;
+    --secondary: 0 0% 10%;
+    --secondary-foreground: 0 0% 90%;
+    --muted: 0 0% 10%;
+    --muted-foreground: 0 0% 45%;
+    --accent: 0 0% 10%;
+    --accent-foreground: 0 0% 90%;
     --destructive: 0 72% 51%;
-    --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 20%;
-    --input: 0 0% 20%;
-    --ring: 270 70% 60%;
+    --destructive-foreground: 0 0% 90%;
+    --border: 0 0% 11%;
+    --input: 0 0% 11%;
+    --ring: 142 70% 56%;
     --radius: 0.75rem;
   }
 }
@@ -31,31 +31,32 @@
   * {
     @apply border-border;
   }
-  
+
   html {
     scroll-behavior: smooth;
   }
-  
+
   body {
     @apply bg-background text-foreground;
   }
-  
+
   /* Custom scrollbar */
   ::-webkit-scrollbar {
     width: 8px;
     height: 8px;
   }
-  
+
   ::-webkit-scrollbar-track {
-    @apply bg-zinc-950;
+    background: #09090b;
   }
-  
+
   ::-webkit-scrollbar-thumb {
-    @apply bg-zinc-800 rounded-full;
+    background: #1c1c1c;
+    border-radius: 9999px;
   }
-  
+
   ::-webkit-scrollbar-thumb:hover {
-    @apply bg-zinc-700;
+    background: #2c2c2c;
   }
 }
 
@@ -63,170 +64,174 @@
   /* ── Article typography (prose overrides) ───────────────── */
   .article-content,
   article.prose {
-    /* Better line height for readability */
     line-height: 1.85 !important;
   }
 
   .article-content p,
   article.prose p {
-    @apply mb-6 text-zinc-300;
+    @apply mb-6;
+    color: #a3a3a3;
     line-height: 1.85;
     font-size: 1.0625rem;
   }
 
   .article-content h2,
   article.prose h2 {
-    @apply text-2xl font-bold text-white mt-10 mb-4 font-display;
+    color: #e5e5e5;
     font-size: 1.5rem;
+    font-weight: 700;
+    margin-top: 2.5rem;
+    margin-bottom: 1rem;
     letter-spacing: -0.02em;
     padding-bottom: 0.5rem;
-    border-bottom: 1px solid rgba(255,255,255,0.06);
+    border-bottom: 1px solid #1c1c1c;
   }
 
   .article-content h3,
   article.prose h3 {
-    @apply text-lg font-semibold text-white/90 mt-8 mb-3;
+    color: #d4d4d4;
     font-size: 1.125rem;
+    font-weight: 600;
+    margin-top: 2rem;
+    margin-bottom: 0.75rem;
   }
 
-  /* Links — prominent and obviously clickable */
+  /* Links */
   .article-content a,
   article.prose a {
-    @apply text-violet-400 hover:text-violet-300 transition-colors;
+    color: #4ade80;
     text-decoration: underline !important;
-    text-decoration-color: rgba(139, 92, 246, 0.4) !important;
     text-underline-offset: 3px;
     font-weight: 500;
+    transition: color 0.15s;
   }
   .article-content a:hover,
   article.prose a:hover {
-    text-decoration-color: rgba(167, 139, 250, 0.8) !important;
+    color: #86efac;
   }
 
-  /* Blockquotes — styled as callout boxes */
+  /* Blockquotes */
   .article-content blockquote,
   article.prose blockquote {
-    @apply border-l-0 rounded-xl p-5 my-6 text-zinc-300;
-    background: rgba(139, 92, 246, 0.06);
-    border: 1px solid rgba(139, 92, 246, 0.2);
+    background: #111111;
+    border-left: 2px solid #4ade80;
+    border-radius: 0.5rem;
+    padding: 1.25rem;
+    margin: 1.5rem 0;
+    color: #a3a3a3;
     font-style: normal;
     line-height: 1.75;
   }
   .article-content blockquote p,
   article.prose blockquote p {
-    @apply mb-0 text-zinc-300;
+    margin-bottom: 0;
+    color: #a3a3a3;
     font-size: 1rem;
   }
 
-  /* Lists — more spacious */
+  /* Lists */
   .article-content ul,
   article.prose ul {
-    @apply mb-6 pl-6 space-y-2;
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
+  }
+  .article-content ol,
+  article.prose ol {
+    margin-bottom: 1.5rem;
+    padding-left: 1.5rem;
   }
   .article-content li,
   article.prose li {
-    @apply text-zinc-300 mb-1;
+    color: #a3a3a3;
+    margin-bottom: 0.25rem;
     line-height: 1.75;
     font-size: 1.0625rem;
   }
   .article-content ul li::marker,
   article.prose ul li::marker {
-    @apply text-violet-500;
+    color: #525252;
   }
 
   /* Inline code */
   .article-content code,
   article.prose code {
-    @apply font-mono text-sm bg-zinc-900 px-2 py-0.5 rounded text-violet-300;
-    border: 1px solid rgba(139, 92, 246, 0.15);
+    font-family: var(--font-mono), monospace;
+    font-size: 0.875rem;
+    background: #1c1c1c;
+    color: #a3a3a3;
+    padding: 0.125rem 0.5rem;
+    border-radius: 0.25rem;
+    border: 1px solid #2c2c2c;
   }
 
   /* Code blocks */
   .article-content pre,
   article.prose pre {
-    @apply bg-zinc-900 rounded-xl p-5 overflow-x-auto mb-6;
-    border: 1px solid rgba(255,255,255,0.06);
+    background: #111111;
+    border-radius: 0.75rem;
+    padding: 1.25rem;
+    overflow-x: auto;
+    margin-bottom: 1.5rem;
+    border: 1px solid #1c1c1c;
   }
   .article-content pre code,
   article.prose pre code {
-    @apply bg-transparent p-0 text-sm;
+    background: transparent;
+    padding: 0;
+    font-size: 0.875rem;
     border: none;
   }
 
-  /* Horizontal rules — section dividers */
+  /* Horizontal rules */
   .article-content hr,
   article.prose hr {
-    @apply border-zinc-800 my-8;
-    border-image: linear-gradient(to right, transparent, rgba(139,92,246,0.3), transparent) 1;
+    border-color: #1c1c1c;
+    margin: 2rem 0;
   }
 
   /* Tables */
   .article-content table,
   article.prose table {
-    @apply w-full mb-6 text-sm;
+    width: 100%;
+    margin-bottom: 1.5rem;
+    font-size: 0.875rem;
   }
   .article-content th,
   article.prose th {
-    @apply text-zinc-400 font-medium text-xs uppercase tracking-wider;
+    color: #737373;
+    font-weight: 500;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
   }
   .article-content td,
   article.prose td {
-    @apply text-zinc-300 py-2.5;
+    color: #a3a3a3;
+    padding-top: 0.625rem;
+    padding-bottom: 0.625rem;
   }
   .article-content tr,
   article.prose tr {
-    @apply border-b border-zinc-800/50;
+    border-bottom: 1px solid #1c1c1c;
   }
 
   /* Images */
   .article-content img,
   article.prose img {
-    @apply rounded-2xl my-8;
+    border-radius: 0.75rem;
+    margin: 2rem 0;
   }
 
   /* Strong / bold */
   .article-content strong,
   article.prose strong {
-    @apply text-white font-semibold;
+    color: #e5e5e5;
+    font-weight: 600;
   }
 
-  /* ── Legacy article-content class (fallback) ────────────── */
+  /* Legacy article-content class (fallback) */
   .article-content {
-    @apply text-zinc-300;
-  }
-  .article-content p { @apply mb-6 text-zinc-300; line-height: 1.85; font-size: 1.0625rem; }
-  .article-content h1 { @apply text-3xl font-bold text-white mt-10 mb-5; font-family: var(--font-playfair), Georgia, serif; }
-  .article-content h2 { @apply text-2xl font-bold text-white mt-10 mb-4; font-family: var(--font-playfair), Georgia, serif; border-bottom: 1px solid #27272a; padding-bottom: 0.5rem; }
-  .article-content h3 { @apply text-lg font-semibold text-white/90 mt-6 mb-3; }
-  .article-content a { @apply text-violet-400 hover:text-violet-300 underline underline-offset-2 decoration-violet-400/50; font-weight: 500; }
-  .article-content ul { @apply mb-6 pl-6 space-y-2; }
-  .article-content ol { @apply mb-6 pl-6 space-y-2; }
-  .article-content li { @apply text-zinc-300 mb-1; line-height: 1.75; }
-  .article-content code { @apply font-mono text-sm bg-zinc-900 px-2 py-0.5 rounded text-violet-300; border: 1px solid rgba(139,92,246,0.15); }
-  .article-content pre { @apply bg-zinc-900 rounded-xl p-5 overflow-x-auto mb-6; border: 1px solid rgba(255,255,255,0.06); }
-  .article-content pre code { @apply bg-transparent p-0; border: none; }
-  .article-content blockquote { @apply border-l-0 rounded-xl p-5 my-6 text-zinc-300; background: rgba(139,92,246,0.06); border: 1px solid rgba(139,92,246,0.2); font-style: normal; }
-  .article-content img { @apply rounded-2xl my-8; }
-  .article-content hr { @apply border-zinc-800 my-8; }
-
-  
-  /* Glass effect */
-  .glass {
-    @apply bg-zinc-900/50 backdrop-blur-xl border border-zinc-800/50;
-  }
-  
-  /* Gradient text */
-  .gradient-text {
-    @apply bg-gradient-to-r from-violet-400 via-purple-400 to-violet-400 bg-clip-text text-transparent;
-  }
-  
-  /* Glow effects */
-  .glow-violet {
-    @apply shadow-[0_0_30px_rgba(139,92,246,0.3)];
-  }
-  
-  .glow-hover {
-    @apply hover:shadow-[0_0_40px_rgba(139,92,246,0.4)] transition-shadow duration-300;
+    color: #a3a3a3;
   }
 }
 
@@ -250,22 +255,24 @@
 
 /* ── Mobile refinements ────────────────────────────────────── */
 @media screen and (max-width: 640px) {
-  /* Clamp article card font sizes */
   .article-card-title {
     font-size: 0.875rem;
     line-height: 1.4;
   }
 
-  /* Prevent layout shift from images */
   img {
     max-width: 100%;
     height: auto;
   }
 
-  /* Make tables scroll horizontally */
   .prose table {
     display: block;
     overflow-x: auto;
     -webkit-overflow-scrolling: touch;
+  }
+
+  /* Bottom padding for mobile nav + progress bar */
+  .md\:hidden main {
+    padding-bottom: calc(56px + 8px);
   }
 }

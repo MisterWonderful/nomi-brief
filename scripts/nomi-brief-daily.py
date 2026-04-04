@@ -878,6 +878,7 @@ def main():
             content=content,
             category=cat_info['name'],
             tags=cat_info['tags'],
+            entries=structured_entries,
         )
 
         if success:

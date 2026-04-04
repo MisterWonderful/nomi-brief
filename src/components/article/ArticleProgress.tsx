@@ -19,7 +19,7 @@ export function ArticleProgress() {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 h-0.5 bg-zinc-900">
+    <div className="fixed bottom-[56px] left-0 right-0 z-40 h-0.5 bg-zinc-900">
       <div
         className="h-full bg-gradient-to-r from-violet-500 to-purple-500 transition-all duration-100 ease-linear"
         style={{ width: `${progress}%` }}

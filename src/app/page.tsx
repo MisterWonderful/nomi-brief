@@ -37,27 +37,28 @@ export default async function HomePage() {
   const greeting = hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
 
   return (
-    <div className="space-y-1">
-      {/* Minimal header */}
-      <div className="flex items-center justify-between px-1 py-3">
-        <div className="flex items-center gap-2.5">
-          <Newspaper className="w-4 h-4 text-zinc-500" />
+    <div className="space-y-6">
+      {/* Header bar */}
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-3">
+          <div className="w-8 h-8 rounded-lg bg-violet-500/20 border border-violet-500/30 flex items-center justify-center">
+            <Newspaper className="w-4 h-4 text-violet-400" />
+          </div>
           <div>
-            <h1 className="text-sm font-medium text-white leading-none">{greeting}</h1>
-            {todayCount > 0 ? (
-              <p className="text-[11px] text-emerald-400/70 mt-0.5 leading-none">
-                {todayCount} new article{todayCount !== 1 ? "s" : ""} today
-              </p>
-            ) : (
-              <p className="text-[11px] text-zinc-600 mt-0.5 leading-none">No new articles</p>
-            )}
+            <h1 className="text-base font-semibold text-white leading-none">{greeting}, Ryan</h1>
+            <p className="text-[11px] text-zinc-500 mt-0.5 leading-none">
+              {todayCount > 0
+                ? `${todayCount} new article${todayCount !== 1 ? "s" : ""} today`
+                : "No new articles today"}
+            </p>
           </div>
         </div>
-        {totalCount > 0 && (
-          <span className="text-[11px] text-zinc-600">
-            {totalCount} total
-          </span>
-        )}
+
+        {/* Minimal stats pill */}
+        <div className="flex items-center gap-1 px-3 py-1.5 rounded-full bg-zinc-900/60 border border-zinc-800/60">
+          <span className="text-[11px] text-zinc-500">Total</span>
+          <span className="text-[11px] font-semibold text-zinc-300">{totalCount}</span>
+        </div>
       </div>
 
       {/* Article Feed */}

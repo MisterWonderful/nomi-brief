@@ -488,6 +488,30 @@ def publish_article(title, content, category, tags, source="Nomi Brief Daily", e
     return False, None
 
 
+def fetch_og_image(url, timeout=8):
+    """Fetch og:image from a URL by checking its HTML. Returns image URL or empty string."""
+    try:
+        req = Request(url, headers={"User-Agent": "NomiBrief/1.0 (image-fetcher)"})
+        with urlopen(req, timeout=timeout) as resp:
+            html = resp.read().decode("utf-8", errors="ignore")
+        # og:image (property before content)
+        m = re.search(r'<meta[^>]+property=["']og:image["'][^>]+content=["']([^"']+)["']', html)
+        if m:
+            return m.group(1)
+        # og:image (content before property)
+        m = re.search(r'<meta[^>]+content=["']([^"']+)["'][^>]+property=["']og:image["']', html)
+        if m:
+            return m.group(1)
+        # twitter:image fallback
+        m = re.search(r'<meta[^>]+name=["']twitter:image["'][^>]+content=["']([^"']+)["']', html)
+        if m:
+            return m.group(1)
+    except Exception:
+        pass
+    return ""
+
+
+
 def save_to_linkentry(story, article_id=None, category="news"):
     """Save a story as a LinkEntry to Nomi Brief. Returns (success: bool, link_id: str)."""
     url = story.get("link", "")
@@ -622,6 +646,7 @@ def parse_rss_entries(root, source_name, ns):
             "description": desc,
             "source": source_name,
             "_hours_ago": hours_ago,
+            "image": fetch_og_image(link) if link else "",
         }
         entries.append(entry)
 
@@ -687,6 +712,7 @@ def parse_atom_entries(root, source_name, ns):
             "description": content_text[:500],
             "source": source_name,
             "_hours_ago": hours_ago,
+            "image": fetch_og_image(link) if link else "",
         }
         entries.append(entry)
 

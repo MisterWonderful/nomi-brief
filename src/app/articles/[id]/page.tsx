@@ -196,9 +196,6 @@ export default async function ArticlePage({ params }: ArticlePageProps) {
               </h2>
               <div className="flex-1 h-px bg-[#1c1c1c]" />
             </div>
-            <p className="text-xs text-[#525252] text-center -mt-2">
-              Bookmark any story below to save it to a list
-            </p>
             <div className="flex flex-col gap-2">
               {entries.map((entry, i) => (
                 <DigestEntryCard key={i} entry={entry} index={i + 1} />

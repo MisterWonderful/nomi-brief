@@ -462,22 +462,48 @@ Format for each item:
                         why = line.replace("**Why it matters:**", "").strip()
                 results[title] = {"tldr": tldr, "why_it_matters": why}
 
-        # Map back to items
+        # Map back to items — use normalized title matching
         outputs = []
         for item in items:
-            title_key = item.get("title", "")
-            # Try exact match, then partial
+            title_key = item.get("title", "").strip()
+            title_base = title_key.split("/")[-1].lower().replace("-", " ").replace("_", " ")
             match = results.get(title_key)
             if not match:
                 for k, v in results.items():
-                    if title_key.lower() in k.lower() or k.lower() in title_key.lower():
+                    k_lower = k.lower()
+                    if title_key.lower() == k_lower or title_base == k_lower or title_base in k_lower or k_lower in title_base:
                         match = v
                         break
-            outputs.append(match or {"tldr": item.get("description", "")[:200], "why_it_matters": "See project for details."})
+            if match:
+                outputs.append(match)
+            else:
+                stars = item.get("stars", 0)
+                language = item.get("language", "")
+                topics = item.get("topics", [])
+                name = title_key.split("/")[-1] if "/" in title_key else title_key
+                name_clean = re.sub(r"[-_]", " ", name)
+                first_topic = topics[0] if topics else "various topics"
+                outputs.append({
+                    "tldr": f"A {language} project called {name_clean} with {stars:,} stars -- {first_topic}.",
+                    "why_it_matters": f"{'Popular' if stars > 1000 else 'Growing'} open-source project worth watching.",
+                })
         return outputs
     except Exception as e:
-        log(f"MiniMax API error: {e}. Using fallback summaries.", "⚠️")
-        return [{"tldr": item.get("description", "")[:200], "why_it_matters": "See project for details."} for item in items]
+        log(f"MiniMax API error: {e}. Regenerating summaries from title analysis.", "⚠️")
+        outputs = []
+        for item in items:
+            title = item.get("title", "").strip()
+            stars = item.get("stars", 0)
+            language = item.get("language", "")
+            topics = item.get("topics", [])
+            name = title.split("/")[-1] if "/" in title else title
+            name_clean = re.sub(r"[-_]", " ", name)
+            first_topic = topics[0] if topics else "various topics"
+            outputs.append({
+                "tldr": f"A {language} project called {name_clean} with {stars:,} stars -- {first_topic}.",
+                "why_it_matters": f"{'Popular' if stars > 1000 else 'Growing'} open-source project worth watching.",
+            })
+        return outputs
 
 
 # ─── Ranking ──────────────────────────────────────────────────────────────────
